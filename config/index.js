@@ -5,5 +5,6 @@ module.exports = {
   MONGO_ATLAS: process.env.MONGO_ATLAS,
   JWT_SECRET: process.env.JWT_SECRET,
   PASSPORT_SECRET: process.env.PASSPORT_SECRET,
-  ENV:process.env.ENV
+  ENV:process.env.ENV,
+  HOST:process.env.HOST
 };
