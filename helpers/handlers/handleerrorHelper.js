@@ -5,7 +5,7 @@ const {
   UNAUTHORIZED,
   UNPROCESSENTITY,
   BADREQUEST,
-} = require("./responseHelper");
+} = require("../response/responseHelper");
 const handleError = (error, res) => {
   if (error.name === "HttpNotFound") {
     return NOTFOUND(res, error.message);

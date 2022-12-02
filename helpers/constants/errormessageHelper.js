@@ -9,7 +9,7 @@ const EMAIL_REGISTERED='the email address is associatec to an existing user'
 const ORGANIZATION_NOT_FOUND='organization not found'
 const NO_CONTENT='no content'
 const NOT_FOUND='not found'
-const UN_AUTHORIZED='your are not authorized to access'
+// const UN_AUTHORIZED='your are not authorized to access'
 const INVALID_OTP='Invalid OTP'
 const INVALID_REFERRAL_CODE='invalid referral code'
 const ROLE_DELETE_NOT_ALLOWED='user is associated with this role thus unable to delete'
@@ -17,7 +17,21 @@ const INCORRECT_PASSWORD='incorrect old password'
 const SMS_SENT_ERROR='technical error occured.Try again after some time'
 const INCORRECT_PAYABLE_AMOUNT='incorrect payable amount'
 const GSNT_ALREADY_EXISTS='GSTN is already exists'
+const EMAIL_ALREADY='The email already present in database, the value is updated'
+const NOT_ADMIN='your not a admin'
+const UN_AUTHORIZED='unauthorized'
+const NEED_REGISTERATION='contact admin for registration'
+const FIRST_PASSWORD="you doesn't have access to set password contact admin"
+const USER_DELETE='user deleted'
+const SOMETHING='something went wrong'
 module.exports = {
+  SOMETHING,
+  USER_DELETE,
+  FIRST_PASSWORD,
+  NEED_REGISTERATION,
+  UN_AUTHORIZED,
+  NOT_ADMIN,
+  EMAIL_ALREADY,
   WRONG_USER_OR_PASSWORD,
   EMAIL_REGISTERED,
   GSNT_ALREADY_EXISTS,

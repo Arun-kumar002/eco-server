@@ -1,4 +1,6 @@
 const JWT = require("jsonwebtoken");
+const { validationResult } = require("express-validator");
+//!local module
 const authmodal = require("../Modal/AuthModal");
 const adminModal = require("../Modal/AdminModel");
 const { JWT_SECRET } = require("../config/index");
@@ -7,7 +9,16 @@ const {
   registerSchema,
 } = require("../helpers/validators/validationHelper");
 const { UNPROCESSENTITY } = require("../helpers/response/responseHelper");
-const { validationResult } = require("express-validator");
+const {
+  EMAIL_ALREADY,
+  NOT_ADMIN,
+  UN_AUTHORIZED,
+  NEED_REGISTERATION,
+  FIRST_PASSWORD,
+} = require("../helpers/constants/errormessageHelper");
+const { SUCCESSFUL } = require("../helpers/constants/successmessageHelper");
+const { handleError } = require("../helpers/handlers/handleerrorHelper");
+//!local ends
 const registerController = async (req, res, next) => {
   console.log(req.body);
   try {
@@ -31,17 +42,17 @@ const registerController = async (req, res, next) => {
         { useredit: true }
       );
       res.json({
-        message: "The email already present in database, the value is updated",
+        message: EMAIL_ALREADY,
         update,
       });
     } else {
       let user = await authmodal.create(req.body);
       let { username, email, mobile } = user;
       let data = { username, email, mobile };
-      res.status(200).json({ message: "successfull", data });
+      res.status(200).json({ message: SUCCESSFUL, data });
     }
   } catch (error) {
-    console.log(error);
+    handleError(error, res);
   }
 };
 const loginController = async (req, res, next) => {
@@ -56,10 +67,10 @@ const loginController = async (req, res, next) => {
             expiresIn: "5d",
           });
           let payload = { role: user.role };
-          res.status(200).json({ message: "successfull", payload, token });
+          res.status(200).json({ message: SUCCESSFUL, payload, token });
         }
       } else {
-        res.json({ message: "your not a admin" });
+        res.json({ message: NOT_ADMIN });
       }
     } else if (req.body.admin === false) {
       let user = await authmodal.findOne({
@@ -73,18 +84,18 @@ const loginController = async (req, res, next) => {
             expiresIn: "5d",
           });
           let payload = { role: user.role };
-          res.status(200).json({ message: "successfull", payload, token });
+          res.status(200).json({ message: SUCCESSFUL, payload, token });
         } else {
-          res.json({ message: "unauthorized" });
+          res.json({ message: UN_AUTHORIZED });
         }
       } else {
-        res.json({ message: "contact admin for registration" });
+        res.json({ message: NEED_REGISTERATION });
       }
     } else {
-      res.json({ message: "contact admin for registration" });
+      res.json({ message: NEED_REGISTERATION });
     }
   } catch (error) {
-    console.log(error);
+    handleError(error, res);
   }
 };
 const newUserPasswordController = async (req, res, next) => {
@@ -96,9 +107,9 @@ const newUserPasswordController = async (req, res, next) => {
         { password: req.body.password, useredit: false }
       );
       console.log(user);
-      res.status(200).json({ message: "successfull", user });
+      res.status(200).json({ message: SUCCESSFUL, user });
     } else {
-      res.json({ message: "your not the first time user" });
+      res.json({ message: FIRST_PASSWORD });
     }
   } catch (error) {
     console.log(error);
@@ -107,17 +118,17 @@ const newUserPasswordController = async (req, res, next) => {
 const adminController = async (req, res, next) => {
   try {
     let admin = await adminModal.create(req.body);
-    res.status(200).json({ message: "admin registered", admin });
+    res.status(200).json({ message: SUCCESSFUL, admin });
   } catch (error) {
-    console.log(error);
+    handleError(error, res);
   }
 };
 const deleteController = async (req, res, next) => {
   try {
     let deleted = await authmodal.deleteOne({ email: req.body.email });
-    res.status(200).json({ message: "successfull", deleted });
+    res.status(200).json({ message: SUCCESSFUL, deleted });
   } catch (error) {
-    console.log(error);
+    handleError(error, res);
   }
 };
 module.exports = {

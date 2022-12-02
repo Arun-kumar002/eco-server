@@ -29,3 +29,4 @@ console.log(
     8000
   )
 );
+module.exports = { delay, checkFileCreated };
