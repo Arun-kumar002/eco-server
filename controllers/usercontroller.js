@@ -1,7 +1,4 @@
-const JWT = require("jsonwebtoken");
 const authmodal = require("../Modal/AuthModal");
-const adminModal = require("../Modal/AdminModel");
-const { JWT_SECRET } = require("../config/index");
 const { handleError } = require("../helpers/response/handleerrorHelper");
 const useralldatacontroller = async (req, res, next) => {
   try {

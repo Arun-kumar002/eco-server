@@ -14,11 +14,12 @@ routes.post(`/${baseRoute}/login`, loginController);
 //url=http://localhost:5000/auth/newuser
 routes.post(`/${baseRoute}/setpassword`, newUserPasswordController);
 //@access private --method-POST
-//url=http://localhost:5000/auth/admin/register
-routes.post("/admin/addadmin", adminController);
-//@access private --method-POST
 //url=http://localhost:5000/auth/user/delete
 routes.post(`/${baseRoute}/delete`, deleteController);
+//!admin
+//@access private --method-POST
+//url=http://localhost:5000/auth/admin/register
+routes.post("/admin/addadmin", adminController);
 
 //TODO exporting all routes
 module.exports = routes;

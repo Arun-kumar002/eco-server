@@ -2,9 +2,27 @@ const JWT = require("jsonwebtoken");
 const authmodal = require("../Modal/AuthModal");
 const adminModal = require("../Modal/AdminModel");
 const { JWT_SECRET } = require("../config/index");
+const {
+  parseError,
+  registerSchema,
+} = require("../helpers/validators/validationHelper");
+const { UNPROCESSENTITY } = require("../helpers/response/responseHelper");
+const { validationResult } = require("express-validator");
 const registerController = async (req, res, next) => {
   console.log(req.body);
   try {
+    //server side validation
+    await Promise.all(registerSchema.map((validate) => validate.run(req)));
+    let error = validationResult(req);
+    if (!error.isEmpty()) {
+      const processedErrors = await parseError(
+        error.array({
+          onlyFirstError: true,
+        })
+      );
+      UNPROCESSENTITY(res, processedErrors[0]);
+    }
+    //validation ends
     let email = req.body.email;
     // let check = await authmodal.findOne({ email: email });
     if (req.body.accept === true) {
