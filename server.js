@@ -6,14 +6,16 @@ const app = express();
 //!local modules
 const { connectDb } = require("./config/db");
 const { PORT, HOST } = require("./config/index");
-const authRoutes=require('./routes/authroutes')
+const authRoutes = require("./routes/authroutes");
+const userRoute = require("./routes/userroute");
 //!middleware section
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(morgan("dev"));
 //!mount here
-app.use('/auth',authRoutes)
+app.use("/", userRoute);
+app.use("/auth", authRoutes);
 //!server section
 connectDb();
 app.listen(PORT, HOST, (_) => {

@@ -32,10 +32,16 @@ const loginController = async (req, res, next) => {
       let user = await adminModal.findOne({
         email: req.body.email,
       });
-      if (user.password === req.body.password) {
-        let token = JWT.sign({ id: user._id }, JWT_SECRET, { expiresIn: "5d" });
-        let payload = { role: user.role };
-        res.status(200).json({ message: "successfull", payload, token });
+      if (user != null) {
+        if (user.password === req.body.password) {
+          let token = JWT.sign({ id: user._id }, JWT_SECRET, {
+            expiresIn: "5d",
+          });
+          let payload = { role: user.role };
+          res.status(200).json({ message: "successfull", payload, token });
+        }
+      } else {
+        res.json({ message: "your not a admin" });
       }
     } else if (req.body.admin === false) {
       let user = await authmodal.findOne({
@@ -88,9 +94,18 @@ const adminController = async (req, res, next) => {
     console.log(error);
   }
 };
+const deleteController = async (req, res, next) => {
+  try {
+    let deleted = await authmodal.deleteOne({ email: req.body.email });
+    res.status(200).json({ message: "successfull", deleted });
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   registerController,
   loginController,
   newUserPasswordController,
   adminController,
+  deleteController,
 };
