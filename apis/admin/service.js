@@ -1,5 +1,5 @@
-const { parseError } = require("../../helpers/validators/validationHelper");
 const { validationResult } = require("express-validator");
+const { parseError } = require("../../helpers/validators/validationHelper");
 const validationService = async (req, res, next) => {
   //server side validation
   let error = validationResult(req);
@@ -13,4 +13,5 @@ const validationService = async (req, res, next) => {
   }
   next();
 };
+
 module.exports = { validationService };

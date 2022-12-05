@@ -1,3 +1,6 @@
+const JWT = require("jsonwebtoken");
+const { JWT_SECRET } = require('./../config/index');
+
 const generateRandomString = (length) => {
   let result = "";
   const characters =
@@ -13,4 +16,10 @@ const generateRandomNumber = (minlevel, maxlevel) => {
   result += Math.floor(Math.random() * (maxlevel - minlevel) + minlevel);
   return result;
 };
-module.exports = { generateRandomString, generateRandomNumber };
+const generateToken = (id) => {
+  let token = JWT.sign({ id }, JWT_SECRET, {
+    expiresIn: "5d",
+  });
+  return token
+};
+module.exports = { generateRandomString, generateRandomNumber, generateToken };

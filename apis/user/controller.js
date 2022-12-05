@@ -10,7 +10,6 @@ const {
 const registerController = async (req, res, next) => {
   console.log(req.body);
   try {
-    //validation ends
     let email = req.body.email;
     // let check = await authmodal.findOne({ email: email });
     if (req.body.accept === true) {
@@ -20,7 +19,6 @@ const registerController = async (req, res, next) => {
       );
       res.json({
         message: EMAIL_ALREADY,
-        update,
       });
     } else {
       let user = await authmodal.create(req.body);
