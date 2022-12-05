@@ -31,7 +31,7 @@ const registerController = async (req, res, next) => {
           onlyFirstError: true,
         })
       );
-      UNPROCESSENTITY(res, processedErrors[0]);
+      res.json({ message: processedErrors[0] });
     }
     //validation ends
     let email = req.body.email;
@@ -101,6 +101,9 @@ const loginController = async (req, res, next) => {
 const newUserPasswordController = async (req, res, next) => {
   try {
     let check = await authmodal.findOne({ email: req.body.email });
+    if (check === null) {
+      res.json({ message: "your not a registered person" });
+    }
     if (check.useredit === true) {
       let user = await authmodal.findOneAndUpdate(
         { email: req.body.email },

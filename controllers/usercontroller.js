@@ -10,7 +10,6 @@ const useralldatacontroller = async (req, res, next) => {
   try {
     let pageno = req.query.pageno;
     let limit = req.query.limit;
-    console.log(pageno, limit);
     let alldata = await authmodal
       .find()
       .skip(pageno * limit)

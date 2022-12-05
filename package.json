@@ -4,13 +4,15 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/jest": "^29.2.3",
+    "@types/supertest": "^2.0.12",
     "consola": "^2.15.3",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
@@ -24,6 +26,11 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.8.0",
     "pdf-to-png": "^1.0.3",
+    "supertest": "^6.3.1",
+    "ts-jest": "^29.0.3",
     "wkhtmltopdf": "^0.4.0"
+  },
+  "devDependencies": {
+    "jest": "^29.3.1"
   }
 }

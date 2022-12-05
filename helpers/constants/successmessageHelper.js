@@ -1,6 +1,6 @@
 const LOGIN_SUCCESS='Login was successful'
 const LOGOUT_SUCCESS='Logout was successful'
-const SUCCESSFUL='Successful'
+const SUCCESSFUL='successfull'
 const CREATED='Created'
 const OK='Ok'
 const UPDATED='Updated'

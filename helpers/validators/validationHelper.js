@@ -13,18 +13,18 @@ const registerSchema = checkSchema({
       errorMessage: "username cannot be empty",
     },
   },
-  password: {
-    isLength: {
-      errorMessage: "password should be greater than 6",
-      options: { min: 5 },
-    },
-    exists: {
-      errorMessage: "password is required",
-    },
-    isEmpty: {
-      negated: true,
-      errorMessage: "password cannot be empty",
-    },
+  // password: {
+  //   isLength: {
+  //     errorMessage: "password should be greater than 4",
+  //     options: { min: 5 },
+  //   },
+  //   exists: {
+  //     errorMessage: "password is required",
+  //   },
+  //   isEmpty: {
+  //     negated: true,
+  //     errorMessage: "password cannot be empty",
+  //   },
     // custom: {
     //   options: (value, { req }) => {
     //     let re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,}$/;
@@ -36,7 +36,7 @@ const registerSchema = checkSchema({
     //     return true;
     //   },
     // },
-  },
+  // },
   email: {
     isEmail: {
       errorMessage: "enter a valid email id",
