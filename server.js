@@ -22,7 +22,7 @@ app.use("/", notfound);
 
 //!server section
 connectDb();
-app.listen(PORT, HOST, (_) => {
+app.listen(PORT, (_) => {
   console.log(`server is listen port no ${PORT}`);
 });
 
