@@ -37,7 +37,7 @@ describe("user", () => {
   });
   describe("/user delete", () => {
     it("it should delete a existing user", async () => {
-      let id = "63898665e6e76f8d54291e45";
+      let id = "63898646e6e76f8d54291e3f";
       await supertest(app).delete(`/user/${id}`).expect(200);
     });
   });

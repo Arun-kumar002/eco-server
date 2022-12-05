@@ -6,8 +6,8 @@ const app = express();
 //!local modules
 const { connectDb } = require("./config/db");
 const { PORT, HOST } = require("./config/index");
-const authRoutes = require("./routes/authroutes");
-const userRoute = require("./routes/userroute");
+const adminRoutes = require("./apis/admin/route");
+const userRoute = require("./apis/user/route");
 const notfound = require("./routes/notfoundroute");
 
 //!middleware section
@@ -17,7 +17,7 @@ app.use(cors());
 app.use(morgan("dev"));
 //!mount here
 app.use("/", userRoute);
-app.use("/auth", authRoutes);
+app.use("/auth", adminRoutes);
 app.use("/", notfound);
 
 //!server section
