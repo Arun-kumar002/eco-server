@@ -4,17 +4,19 @@ const AdminSchmema = new Schema(
   {
     email: {
       type: String,
+      require: true,
     },
     password: {
       type: String,
+      select: false,
     },
     role: {
       type: String,
-      default: "admin",
-      require: false,
+      require: true,
+      enum: ["admin"],
     },
   },
   { timestamps: true }
 );
 
-module.exports = model("ecoadmin", AdminSchmema);
+module.exports = model("AdminUser", AdminSchmema);

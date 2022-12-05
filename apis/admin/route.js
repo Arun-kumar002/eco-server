@@ -1,20 +1,18 @@
 const routes = require("express").Router();
-const {
-  loginController,
-  adminController,
-  // deleteController,
-} = require("./controller");
-//@access private --method-POST
-//url=http://localhost:5000/auth/login
-routes.post(`/login`, loginController);
+const { validateAdmin, addAdmin } = require("./service");
+const { loginSchema } = require("../../helpers/validators/validationHelper");
 
-// //@access private --method-POST
-// //url=http://localhost:5000/auth/user/delete
-//// routes.post(`/${baseRoute}/delete`, deleteController);
-//!admin
+const baseRoute = "admin";
+
+
 //@access private --method-POST
-//url=http://localhost:5000/auth/admin/register
-routes.post("/admin/addadmin", adminController);
+//url=http://localhost:5000/auth/admin/login
+routes.post(`/${baseRoute}/login`, loginSchema, validateAdmin);
+
+//@access private --method-POST
+//url=http://localhost:5000/auth/admin
+routes.post(`/${baseRoute}`, addAdmin);
+
 
 //TODO exporting all routes
 module.exports = routes;

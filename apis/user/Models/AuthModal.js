@@ -4,12 +4,17 @@ const UserSchema = new Schema(
   {
     username: {
       type: String,
+      require:true
     },
     email: {
       type: String,
+      require:true
+
     },
     mobile: {
       type: String,
+      require:true
+
     },
     password: {
       type: String,
@@ -23,7 +28,6 @@ const UserSchema = new Schema(
     role: {
       type: String,
       default: "user",
-      require: false,
     },
   },
   { timestamps: true }

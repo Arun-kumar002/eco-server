@@ -1,39 +1,39 @@
 const routes = require("express").Router();
 const {
-  useralldatacontroller,
-  userdeletecontroller,
-  getindividualuser,
-  induserupdatecontroller,
-  registerController,
-  newUserPasswordController,
-} = require("./controller");
-const { registerSchema } = require("../../helpers/validators/validationHelper");
-const { validationService } = require("./services");
+  adduser,
+  validateUser,
+  userData,
+  deleteUser,
+  oneUser,
+  oneUserUpdate,
+  addUserPassword,
+} = require("./services");
+const {
+  registerSchema,
+  loginSchema,
+} = require("../../helpers/validators/validationHelper");
 const baseRoute = "user";
 //@access public --method-get
 //url=http://localhost:5000/user
-routes.get(`/${baseRoute}`, useralldatacontroller);
+routes.get(`/${baseRoute}`, userData);
 //@access public --method-get
 //url=http://localhost:5000/user/:id
-routes.get(`/${baseRoute}/:id`, getindividualuser);
+routes.get(`/${baseRoute}/:id`, oneUser);
 //@access private --method-POST
 //url=http://localhost:5000/user/register
-routes.post(
-  `/${baseRoute}`,
-  registerSchema,
-  validationService,
-  registerController
-);
+routes.post(`/${baseRoute}`, registerSchema, adduser);
+//@access private --method-POST
+//url=http://localhost:5000/user/login
+routes.post(`/${baseRoute}/login`, loginSchema, validateUser);
 //@access private --method-POST
 //url=http://localhost:5000/user/setpassword
-routes.post(`/${baseRoute}/setpassword`, newUserPasswordController);
+routes.put(`/${baseRoute}/setpassword`, addUserPassword);
 //@access private --method-put
 //url=http://localhost:5000/user/:id
-routes.put(`/${baseRoute}/:id`, induserupdatecontroller);
-
+routes.put(`/${baseRoute}/:id`, oneUserUpdate);
 //@access privat --method-delete
 //url=http://localhost:5000/user/:id
-routes.delete(`/${baseRoute}/:id`, userdeletecontroller);
+routes.delete(`/${baseRoute}/:id`, deleteUser);
 
 //TODO exporting all routes
 module.exports = routes;

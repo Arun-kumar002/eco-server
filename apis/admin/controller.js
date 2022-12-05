@@ -1,73 +1,37 @@
 //!local module
-const adminModal = require("../admin/Models/AdminModel");
-const {
-  NOT_ADMIN,
-  UN_AUTHORIZED,
-  NEED_REGISTERATION,
-} = require("../../helpers/constants/errormessageHelper");
-const { SUCCESSFUL } = require("../../helpers/constants/successmessageHelper");
-const { handleError } = require("../../helpers/handlers/handleerrorHelper");
+const AdminModel = require("./Models/AdminModel");
+const tag = "admin Controller";
 const { generateToken } = require("../../helpers/generaterandonHelpers");
-const AuthModal = require("../user/Models/AuthModal");
 //!local ends
-const loginController = async (req, res, next) => {
+const loginController = async (email, password) => {
   try {
-    if (req.body.admin === true) {
-      let user = await adminModal.findOne({
-        email: req.body.email,
-      });
-      if (user != null) {
-        if (user.password === req.body.password) {
-          let token = generateToken(user._id);
-          let payload = { role: user.role };
-          res.status(200).json({ message: SUCCESSFUL, payload, token });
-        }
-      } else {
-        res.json({ message: NOT_ADMIN });
-      }
-    } else if (req.body.admin === false) {
-      let user = await AuthModal.findOne({
-        email: req.body.email,
-      });
-      console.log('not admin');
-      console.log(user);
-      if (user!= null) {
-        if (user.password === req.body.password) {
-          let token = generateToken(user._id);
-          let payload = { role: user.role };
-          res.status(200).json({ message: SUCCESSFUL, payload, token });
-        } else {
-          res.json({ message: UN_AUTHORIZED });
-        }
-      } else {
-        res.json({ message: NEED_REGISTERATION });
-      }
-    } else {
-      res.json({ message: NEED_REGISTERATION });
+    let user = await AdminModel.findOne({ email: email }).select("+password");
+    console.log(user, "user");
+    if (user != null && user.password === password) {
+      let token = generateToken(user._id);
+      let payload = { role: user.role };
+
+      return { message: "successfull", payload, token, status: "success" };
     }
+
+    return { message: "not admin", status: "error" };
   } catch (error) {
-    handleError(error, res);
+    console.log(`[${tag}]-logincontroller`, error);
+    return { message: "unknown error", status: "error" };
   }
 };
 
-const adminController = async (req, res, next) => {
+const adminController = async ({ ...data }) => {
   try {
-    let admin = await adminModal.create(req.body);
-    res.status(200).json({ message: SUCCESSFUL, admin });
+    let admins = await adminModal.create(data);
+    return { message: "successful", admins, status: "success" };
   } catch (error) {
-    handleError(error, res);
+    console.log(`[${tag}]-admincontroller`, error);
+    return { message: "unsuccessfull", status: "error" };
   }
 };
-// //const deleteController = async (req, res, next) => {
-//   //try {
-// //    let deleted = await authmodal.deleteOne({ email: req.body.email });
-// //    res.status(200).json({ message: SUCCESSFUL, deleted });
-// //  } catch (error) {
-// //    handleError(error, res);
-// //  }
-// //};
+
 module.exports = {
   loginController,
   adminController,
-  // deleteController,
 };

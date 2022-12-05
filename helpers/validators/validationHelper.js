@@ -13,18 +13,19 @@ const registerSchema = checkSchema({
       errorMessage: "username cannot be empty",
     },
   },
-  // password: {
-  //   isLength: {
-  //     errorMessage: "password should be greater than 4",
-  //     options: { min: 5 },
-  //   },
-  //   exists: {
-  //     errorMessage: "password is required",
-  //   },
-  //   isEmpty: {
-  //     negated: true,
-  //     errorMessage: "password cannot be empty",
-  //   },
+  password: {
+    isLength: {
+      errorMessage: "password should be greater than 4",
+      options: { min: 5 },
+    },
+    exists: {
+      errorMessage: "password is required",
+    },
+    isEmpty: {
+      negated: true,
+      errorMessage: "password cannot be empty",
+    },
+  },
     // custom: {
     //   options: (value, { req }) => {
     //     let re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,}$/;
@@ -43,6 +44,26 @@ const registerSchema = checkSchema({
     },
   },
 });
+const loginSchema=checkSchema({
+  email: {
+    isEmail: {
+      errorMessage: "enter a valid email id",
+    },
+  },
+  password: {
+    isLength: {
+      errorMessage: "password should be greater than 4",
+      options: { min: 5 },
+    },
+    exists: {
+      errorMessage: "password is required",
+    },
+    isEmpty: {
+      negated: true,
+      errorMessage: "password cannot be empty",
+    },
+  },
+})
 //! parse the validation requsets
 const parseError = (error) => {
   const query = error.map((err) => {
@@ -52,4 +73,4 @@ const parseError = (error) => {
   });
   return query;
 };
-module.exports = { registerSchema, parseError };
+module.exports = { registerSchema, parseError ,loginSchema};

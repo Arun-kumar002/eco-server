@@ -5,7 +5,7 @@ const morgan = require("morgan");
 const app = express();
 //!local modules
 const { connectDb } = require("./config/db");
-const { PORT, HOST } = require("./config/index");
+const { PORT } = require("./config/index");
 const adminRoutes = require("./apis/admin/route");
 const userRoute = require("./apis/user/route");
 const notfound = require("./routes/notfoundroute");
