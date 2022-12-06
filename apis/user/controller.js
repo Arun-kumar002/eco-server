@@ -5,13 +5,7 @@ const userSuccess = require("./res/userSuccess");
 const userErrors = require("./res/userError");
 const tag = "user-Controller";
 
-const registerController = async ({
-  username,
-  password,
-  mobile,
-  role,
-  email,
-}) => {
+const createUser = async ({ username, password, mobile, role, email }) => {
   try {
     let checked = await check({ email, modal: AuthModal });
     console.log(checked);
@@ -26,12 +20,12 @@ const registerController = async ({
 
     return await created({ modal: AuthModal }, { values: payload });
   } catch (error) {
-    console.log(`[${tag}]-registerController`, error);
-    return userErrors.internalError();
+    console.log(`[${tag}]-createUser`, error);
+    return { message: "internal server error", status: "error", code: 500 };
   }
 };
 
-const loginController = async ({ email, password }) => {
+const validateUser = async ({ email, password }) => {
   try {
     let checked = await get(email, AuthModal);
 
@@ -40,17 +34,17 @@ const loginController = async ({ email, password }) => {
       let payload = { role: checked.role };
       let data = { token, payload };
 
-      return user({ data: data });
+      return { message: "successfull", data, status: "success", code: 200 };
     }
 
-    return userErrors.unauthorized();
+      throw new Error({message: "your not a authorized person", status: "error",code: 400})
   } catch (error) {
-    console.log(`[${tag}]-loginController`, error);
-    return userErrors.internalError();
+    console.log(`[${tag}]-validateUser`, error);
+    return { message: "internal server error", status: "error", code: 500 };
   }
 };
 
-const useralldatacontroller = async ({ pageno, limit }) => {
+const getAllUsers = async ({ pageno, limit }) => {
   try {
     let alldata = await paginatedata({ modal: AuthModal, limit, pageno });
 
@@ -58,51 +52,51 @@ const useralldatacontroller = async ({ pageno, limit }) => {
 
     if (alldata === null) return userErrors.notFound();
     let data = { user: alldata, total };
-    return userSuccess.Success({ data });
+    return { message: "successfull", data, status: "success", code: 200 };
   } catch (error) {
-    console.log(`[${tag}]-useralldatacontroller`, error);
-    return userErrors.internalError();
+    console.log(`[${tag}]-getAllUsers`, error);
+    return { message: "internal server error", status: "error", code: 500 };
   }
 };
 
-let userdeletecontroller = async (id) => {
+let deleteUser = async (id) => {
   try {
     let deletes = await deleted({ id, modal: AuthModal });
 
-    return userSuccess.Success({ data: deletes });
+    return { message: "successfull", deletes, status: "success", code: 200 };
   } catch (error) {
-    console.log(`[${tag}]-userdeletecontroller`, error);
-    return userErrors.internalError();
+    console.log(`[${tag}]-deleteUser`, error);
+    return { message: "internal server error", status: "error", code: 500 };
   }
 };
 
-let getindividualuser = async ({ id }) => {
+let getUser = async ({ id }) => {
   try {
     let user = await authmodal.findById(id);
 
-    if (user === null) return userErrors.notFound();
+    if (user === null) return { message: "unable to update",status: "error", code: 400};
 
-    return userSuccess.Success({ data: user });
+    return { message: "successfull", user, status: "success", code: 200 };
   } catch (error) {
-    console.log(`[${tag}]-getindividualuser`, error);
-    return userErrors.internalError();
+    console.log(`[${tag}]-getUser`, error);
+    return { message: "internal server error", status: "error", code: 500 };
   }
 };
 
-let induserupdatecontroller = async ({ id, data }) => {
+let userUpdate = async ({ id, data }) => {
   try {
-    let updatedd = await authmodal.findById(id).update(data);
+    let updated = await authmodal.findById(id).update(data);
 
-    if (updated === null) return userErrors.notFound();
+    if (updated === null) return { message: "unable to update",status: "error", code: 400};
 
-    return userSuccess.UpdateSuccess({ data: updatedd });
+    return { message: "successfull", updated, status: "success", code: 200 };
   } catch (error) {
-    console.log(`[${tag}]-induserupdatecontroller`, error);
-    return userErrors.internalError();
+    console.log(`[${tag}]-userUpdate`, error);
+    return { message: "internal server error", status: "error", code: 500 };
   }
 };
 
-const newUserPasswordController = async ({ email, password }) => {
+const setPassword = async ({ email, password }) => {
   try {
     let checked = await get(email, AuthModal);
 
@@ -116,12 +110,12 @@ const newUserPasswordController = async ({ email, password }) => {
         { modal: AuthModal }
       );
 
-      return user
+      return user;
     }
-    return userErrors.unable()
+    return { message: "unable to update",status: "error", code: 400};
   } catch (error) {
-    console.log(`[${tag}]-newUserPasswordController`, error);
-    return userErrors.internalError();
+    console.log(`[${tag}]-setPassword`, error);
+    return { message: "internal server error", status: "error", code: 500 };
   }
 };
 
@@ -195,15 +189,16 @@ const deleted = async ({ id, modal }) => {
     return deleteuser;
   } catch (error) {
     console.log(`[${tag}]-deleted`, error);
+    return;
   }
 };
 
 module.exports = {
-  useralldatacontroller,
-  userdeletecontroller,
-  getindividualuser,
-  induserupdatecontroller,
-  registerController,
-  newUserPasswordController,
-  loginController,
+  createUser,
+  validateUser,
+  getAllUsers,
+  deleteUser,
+  getUser,
+  userUpdate,
+  setPassword,
 };

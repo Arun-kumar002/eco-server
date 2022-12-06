@@ -11,20 +11,21 @@ const validateAdmin = async (req, res, next) => {
 
   try {
     let { email, password } = req.body;
-    let admin = await authControllers.loginController(email, password);
-    res.status(admin.code).json(admin);
+    let admin = await authControllers.validateAdmin(email, password);
+    res.status(200).json(admin);
   } catch (error) {
     console.log(`[${tag}] validateAdmin:`, error);
     res.status(500).json({ message: "internal error", status: "error" });
   }
+
 };
 
-const addAdmin = async (req, res) => {
+const addAdminUser = async (req, res) => {
   try {
-    let admin = await authControllers.adminController(req.body);
-    res.status(admin.code).json(admin);
+    let admin = await authControllers.addAdminUser(req.body);
+    res.status(200).json(admin);
   } catch (error) {
-    console.log(`[${tag}] addAdmin:`, error);
+    console.log(`[${tag}] addAdminUser:`, error);
     res.status(500).json({ message: "internal error", status: "error" });
   }
 };
@@ -43,4 +44,4 @@ const validationService = async (req) => {
 };
 
 
-module.exports = { validateAdmin, addAdmin };
+module.exports = { validateAdmin, addAdminUser };

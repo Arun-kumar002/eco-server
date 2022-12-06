@@ -7,7 +7,7 @@ const success = require("./res/adminSuccess");
 const tag = "admin Controller";
 //!local ends
 
-const loginController = async (email, password) => {
+const validateAdmin = async (email, password) => {
   try {
     let user = await get(email, AdminModel);
 
@@ -15,23 +15,32 @@ const loginController = async (email, password) => {
       let token = generateToken(user._id);
       let payload = { role: user.role };
       let data = { payload, token };
-      return success.Success({ data: data });
+      return { message: "successfull", data, status: "success", code: 200 };
     }
-    return errors.unauthorized();
+    return {
+      message: "your not a authorized person",
+      status: "error",
+      code: 400,
+    };
   } catch (error) {
-    console.log(`[${tag}]-logincontroller`, error);
-    return errors.internalError();
+    console.log(`[${tag}]-validateAdmin`, error);
+    return { message: "internal server error", status: "error", code: 500 };
   }
 };
 
-const adminController = async ({ ...data }) => {
+const addAdminUser = async ({ ...data }) => {
   try {
-    let admins = await created({ modal: AdminModel }, { values: { ...data } });
+    let admin= await created({ modal: AdminModel }, { values: { ...data } });
 
-    return success.Success({ data: admins });
+    return {
+      message: "successfull",
+      data: admin,
+      status: "success",
+      code: 200,
+    };
   } catch (error) {
-    console.log(`[${tag}]-admincontroller`, error);
-    return errors.internalError();
+    console.log(`[${tag}]-addAdminUser`, error);
+    return { message: "internal server error", status: "error", code: 500 };
   }
 };
 
@@ -46,6 +55,7 @@ let created = async ({ modal }, { values }) => {
     console.log(`[${tag}]-created`, error);
   }
 };
+
 const get = async (email, modal) => {
   try {
     let user = await modal.findOne({ email: email }).select("+password");
@@ -57,6 +67,6 @@ const get = async (email, modal) => {
   }
 };
 module.exports = {
-  loginController,
-  adminController,
+  validateAdmin,
+  addAdminUser,
 };

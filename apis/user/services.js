@@ -1,5 +1,4 @@
 const { validationResult } = require("express-validator");
-const { parseError } = require("../../helpers/validators/validationHelper");
 const userControllers = require("./controller");
 const tag = "user-service";
 
@@ -12,7 +11,7 @@ let createUser = async (req, res) => {
     }
 
     let { username, password, mobile, role, email } = req.body;
-    let user = await userControllers.registerController({
+    let user = await userControllers.createUser({
       username,
       password,
       mobile,
@@ -20,9 +19,9 @@ let createUser = async (req, res) => {
       email,
     });
 
-    res.status(user.code).json(user);
+    res.status(200).json(user);
   } catch (error) {
-    console.log(`[${tag}] adduser:`, error);
+    console.log(`[${tag}] createUser:`, error);
     res.status(500).json({ message: "internal server error", status: "error" });
   }
 };
@@ -36,8 +35,8 @@ let validateUser = async (req, res) => {
     }
 
     let { email, password } = req.body;
-    let user = await userControllers.loginController({ email, password });
-    res.status(user.code).json(user);
+    let user = await userControllers.validateUser({ email, password });
+    res.status(200).json(user);
   } catch (error) {
     console.log(`[${tag}] validateUser:`, error);
     res.status(500).json({ message: "internal server error", status: "error" });
@@ -49,10 +48,10 @@ let getAllUsers = async (req, res) => {
     let { pageno } = req.query || 0;
     let { limit } = req.query || 5;
 
-    let user = await userControllers.useralldatacontroller({ pageno, limit });
-    res.status(user.code).json(user);
+    let users = await userController.getAllUsers({ pageno, limit });
+    res.status(200).json({users});
   } catch (error) {
-    console.log(`[${tag}] userData:`, error);
+    console.log(`[${tag}] getAllUsers:`, error);
     res.status(500).json({ message: "internal server error", status: "error" });
   }
 };
@@ -61,8 +60,8 @@ let deleteUser = async (req, res) => {
   try {
     let id = req.params.id;
 
-    let user = await userControllers.userdeletecontroller(id);
-    res.status(user.code).json(user);
+    let user = await userControllers.deleteUser(id);
+    res.status(200).json(user);
   } catch (error) {
     console.log(`[${tag}] deleteUser:`, error);
     res.status(500).json({ message: "internal server error", status: "error" });
@@ -72,11 +71,11 @@ let deleteUser = async (req, res) => {
 let getUser = async (req, res) => {
   try {
     let id = req.params.id;
-    let user = await userControllers.getindividualuser({ id });
+    let user = await userControllers.getUser({ id });
 
-    res.status(user.code).json(user);
+    res.status(code).json(user);
   } catch (error) {
-    console.log(`[${tag}] oneUser:`, error);
+    console.log(`[${tag}] getUser:`, error);
     res.status(500).json({ message: "internal server error", status: "error" });
   }
 };
@@ -87,11 +86,11 @@ let userUpdate = async (req, res) => {
     let { username, password, mobile, role, email } = req.body;
     let data = { username, password, mobile, role, email };
 
-    let user = await userControllers.induserupdatecontroller({ id, data });
+    let user = await userControllers.userUpdate({ id, data });
 
-    res.status(user.code).json(user);
+    res.status(200).json(user);
   } catch (error) {
-    console.log(`[${tag}] oneUser:`, error);
+    console.log(`[${tag}] userUpdate:`, error);
     res.status(500).json({ message: "internal server error", status: "error" });
   }
 };
@@ -104,9 +103,9 @@ let setPassword = async (req, res) => {
       password,
     });
 
-    res.status(user.code).json(user);
+    res.status(200).json(user);
   } catch (error) {
-    console.log(`[${tag}] oneUser:`, error);
+    console.log(`[${tag}] setPassword:`, error);
     res.status(500).json({ message: "internal server error", status: "error" });
   }
 };

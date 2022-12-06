@@ -10,7 +10,7 @@ routes.post(`/${baseRoute}/login`, loginSchema, adminServices.validateAdmin);
 
 //@access private --method-POST
 //url=http://localhost:5000/auth/admin
-routes.post(`/${baseRoute}`, adminServices.addAdmin);
+routes.post(`/${baseRoute}`, adminServices.addAdminUser);
 
 
 //TODO exporting all routes

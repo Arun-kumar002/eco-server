@@ -7,4 +7,5 @@ let UpdateSuccess=({data})=>{
     return { message: "updated successfully", data, status: "success",code:202 };
 }
 
+
 module.exports={Success,UpdateSuccess}
