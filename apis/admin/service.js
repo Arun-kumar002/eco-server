@@ -4,14 +4,17 @@ const { parseError } = require("../../helpers/validators/validationHelper");
 const authControllers = require("./controller");
 const tag = "admin-service";
 const validateAdmin = async (req, res, next) => {
-  try {
   let errorMessage = await validationService(req);
   if (errorMessage) {
     return res.status(400).json({ status: "error", message: errorMessage });
   }
 
+  try {
     let { email, password } = req.body;
-    let admin = await authControllers.validateAdmin({ email, password, res });
+
+    let admin = await authControllers.validateAdmin({ email, password });
+
+    res.status(200).json(admin);
   } catch (error) {
     console.log(`[${tag}] validateAdmin:`, error);
 
@@ -21,14 +24,9 @@ const validateAdmin = async (req, res, next) => {
 
 const addAdminUser = async (req, res) => {
   try {
-  let errorMessage = await validationService(req);
-  if (errorMessage) {
-    return res.status(400).json({ status: "error", message: errorMessage });
-  }
-
     let admin = await authControllers.addAdminUser(req.body);
+
     res.status(200).json(admin);
-    
   } catch (error) {
     console.log(`[${tag}] addAdminUser:`, error);
 
