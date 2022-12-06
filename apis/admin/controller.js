@@ -7,7 +7,7 @@ const success = require("./res/adminSuccess");
 const tag = "admin Controller";
 //!local ends
 
-const validateAdmin = async (email, password) => {
+const validateAdmin = async ({ email, password, res }) => {
   try {
     let user = await get(email, AdminModel);
 
@@ -17,11 +17,11 @@ const validateAdmin = async (email, password) => {
       let data = { payload, token };
       return { message: "successfull", data, status: "success", code: 200 };
     }
-    return {
+    res.status(400).json({
       message: "your not a authorized person",
       status: "error",
       code: 400,
-    };
+    });
   } catch (error) {
     console.log(`[${tag}]-validateAdmin`, error);
     return { message: "internal server error", status: "error", code: 500 };
@@ -30,7 +30,7 @@ const validateAdmin = async (email, password) => {
 
 const addAdminUser = async ({ ...data }) => {
   try {
-    let admin= await created({ modal: AdminModel }, { values: { ...data } });
+    let admin = await created({ modal: AdminModel }, { values: { ...data } });
 
     return {
       message: "successfull",

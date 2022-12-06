@@ -8,7 +8,6 @@ const tag = "user-Controller";
 const createUser = async ({ username, password, mobile, role, email }) => {
   try {
     let checked = await check({ email, modal: AuthModal });
-    console.log(checked);
     if (checked) {
       return await updated(
         { email },
@@ -25,7 +24,7 @@ const createUser = async ({ username, password, mobile, role, email }) => {
   }
 };
 
-const validateUser = async ({ email, password }) => {
+const validateUser = async ({ email, password, res }) => {
   try {
     let checked = await get(email, AuthModal);
 
@@ -37,7 +36,11 @@ const validateUser = async ({ email, password }) => {
       return { message: "successfull", data, status: "success", code: 200 };
     }
 
-      throw new Error({message: "your not a authorized person", status: "error",code: 400})
+    res.status(400).json({
+      message: "your not a authorized person",
+      status: "error",
+      code: 400,
+    });
   } catch (error) {
     console.log(`[${tag}]-validateUser`, error);
     return { message: "internal server error", status: "error", code: 500 };
@@ -74,7 +77,8 @@ let getUser = async ({ id }) => {
   try {
     let user = await authmodal.findById(id);
 
-    if (user === null) return { message: "unable to update",status: "error", code: 400};
+    if (user === null)
+      return { message: "unable to update", status: "error", code: 400 };
 
     return { message: "successfull", user, status: "success", code: 200 };
   } catch (error) {
@@ -83,11 +87,14 @@ let getUser = async ({ id }) => {
   }
 };
 
-let userUpdate = async ({ id, data }) => {
+let userUpdate = async ({ id, data, res }) => {
   try {
     let updated = await authmodal.findById(id).update(data);
 
-    if (updated === null) return { message: "unable to update",status: "error", code: 400};
+    if (updated === null)
+      res
+        .status(400)
+        .json({ message: "unable to update", status: "error", code: 400 });
 
     return { message: "successfull", updated, status: "success", code: 200 };
   } catch (error) {
@@ -96,7 +103,7 @@ let userUpdate = async ({ id, data }) => {
   }
 };
 
-const setPassword = async ({ email, password }) => {
+const setPassword = async ({ email, password, res }) => {
   try {
     let checked = await get(email, AuthModal);
 
@@ -112,7 +119,9 @@ const setPassword = async ({ email, password }) => {
 
       return user;
     }
-    return { message: "unable to update",status: "error", code: 400};
+    res
+      .status(400)
+      .json({ message: "unable to update", status: "error", code: 400 });
   } catch (error) {
     console.log(`[${tag}]-setPassword`, error);
     return { message: "internal server error", status: "error", code: 500 };

@@ -1,17 +1,17 @@
 const { validationResult } = require("express-validator");
-const userControllers = require("./controller");
+const userController = require("./controller");
 const tag = "user-service";
 
 let createUser = async (req, res) => {
   try {
-    let validate = await validationService(req);
-    if (validate) {
-      res.status(400).json(validate);
+    let errorMessage = await validationService(req);
+    if (errorMessage) {
+      res.status(400).json({ status: "error", message: errorMessage });
       return;
     }
 
     let { username, password, mobile, role, email } = req.body;
-    let user = await userControllers.createUser({
+    let user = await userController.createUser({
       username,
       password,
       mobile,
@@ -28,14 +28,14 @@ let createUser = async (req, res) => {
 
 let validateUser = async (req, res) => {
   try {
-    let errorMessage = await validationService(req);
 
+    let errorMessage = await validationService(req);
     if (errorMessage) {
       return res.status(400).json({ status: "error", message: errorMessage });
     }
 
     let { email, password } = req.body;
-    let user = await userControllers.validateUser({ email, password });
+    let user = await userController.validateUser({ email, password, res });
     res.status(200).json(user);
   } catch (error) {
     console.log(`[${tag}] validateUser:`, error);
@@ -45,11 +45,16 @@ let validateUser = async (req, res) => {
 
 let getAllUsers = async (req, res) => {
   try {
-    let { pageno } = req.query || 0;
-    let { limit } = req.query || 5;
+    let errorMessage = await validationService(req);
+    if (errorMessage) {
+      res.status(400).json({ status: "error", message: errorMessage });
+      return;
+    }
+    let { pageno } = req.query;
+    let { limit } = req.query;
 
     let users = await userController.getAllUsers({ pageno, limit });
-    res.status(200).json({users});
+    res.status(200).json({ users });
   } catch (error) {
     console.log(`[${tag}] getAllUsers:`, error);
     res.status(500).json({ message: "internal server error", status: "error" });
@@ -58,9 +63,14 @@ let getAllUsers = async (req, res) => {
 
 let deleteUser = async (req, res) => {
   try {
+    let errorMessage = await validationService(req);
+    if (errorMessage) {
+      res.status(400).json({ status: "error", message: errorMessage });
+      return;
+    }
     let id = req.params.id;
 
-    let user = await userControllers.deleteUser(id);
+    let user = await userController.deleteUser(id);
     res.status(200).json(user);
   } catch (error) {
     console.log(`[${tag}] deleteUser:`, error);
@@ -70,8 +80,15 @@ let deleteUser = async (req, res) => {
 
 let getUser = async (req, res) => {
   try {
+
+    let errorMessage = await validationService(req);
+    if (errorMessage) {
+      res.status(400).json({ status: "error", message: errorMessage });
+      return;
+    }
+
     let id = req.params.id;
-    let user = await userControllers.getUser({ id });
+    let user = await userController.getUser({ id });
 
     res.status(code).json(user);
   } catch (error) {
@@ -82,11 +99,18 @@ let getUser = async (req, res) => {
 
 let userUpdate = async (req, res) => {
   try {
+
+    let errorMessage = await validationService(req);
+    if (errorMessage) {
+      res.status(400).json({ status: "error", message: errorMessage });
+      return;
+    }
+
     let id = req.params.id;
     let { username, password, mobile, role, email } = req.body;
     let data = { username, password, mobile, role, email };
 
-    let user = await userControllers.userUpdate({ id, data });
+    let user = await userController.userUpdate({ id, data, res });
 
     res.status(200).json(user);
   } catch (error) {
@@ -97,10 +121,16 @@ let userUpdate = async (req, res) => {
 
 let setPassword = async (req, res) => {
   try {
+    let errorMessage = await validationService(req);
+    if (errorMessage) {
+      res.status(400).json({ status: "error", message: errorMessage });
+      return;
+    }
     let { password, email } = req.body;
-    let user = await userControllers.newUserPasswordController({
+    let user = await userController.newUserPasswordController({
       email,
       password,
+      res,
     });
 
     res.status(200).json(user);
