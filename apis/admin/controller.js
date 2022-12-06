@@ -1,37 +1,61 @@
 //!local module
 const AdminModel = require("./Models/AdminModel");
 const { generateToken } = require("../../helpers/generaterandonHelpers");
-const errorResponse = require("../../utils/errorResponse");
+const errors = require("./res/adminError");
+const success = require("./res/adminSuccess");
+
 const tag = "admin Controller";
 //!local ends
 
 const loginController = async (email, password) => {
   try {
-    let user = await AdminModel.findOne({ email: email }).select("+password");
-    if (user != null && user.password === password) {
+    let user = await get(email, AdminModel);
+
+    if (user && user.password === password) {
       let token = generateToken(user._id);
       let payload = { role: user.role };
-
-      return { message: "successfull", payload, token, status: "success" };
+      let data = { payload, token };
+      return success.Success({ data: data });
     }
-
-    throw new errorResponse("login failed", 400);
+    return errors.unauthorized();
   } catch (error) {
     console.log(`[${tag}]-logincontroller`, error);
-    throw new errorResponse("unknown  error", 500);
+    return errors.internalError();
   }
 };
 
 const adminController = async ({ ...data }) => {
   try {
-    let admins = await AdminModel.create(data);
-    return { message: "successful", admins, status: "success" };
+    let admins = await created({ modal: AdminModel }, { values: { ...data } });
+
+    return success.Success({ data: admins });
   } catch (error) {
     console.log(`[${tag}]-admincontroller`, error);
-    throw new errorResponse("unknown  error", 500);
+    return errors.internalError();
   }
 };
 
+//TODO helper funcions
+let created = async ({ modal }, { values }) => {
+  try {
+    console.log(values);
+    let user = await modal.create(values);
+
+    return { message: "successfull ", user, status: "success" };
+  } catch (error) {
+    console.log(`[${tag}]-created`, error);
+  }
+};
+const get = async (email, modal) => {
+  try {
+    let user = await modal.findOne({ email: email }).select("+password");
+    if (user === null) return false;
+    return user;
+  } catch (error) {
+    console.log(`[${tag}]-check`, error);
+    return false;
+  }
+};
 module.exports = {
   loginController,
   adminController,

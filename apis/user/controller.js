@@ -1,7 +1,8 @@
 const { generateToken } = require("../../helpers/generaterandonHelpers");
 const AuthModal = require("./Models/AuthModal");
 const authmodal = require("./Models/AuthModal");
-const errorResponse = require("../../utils/errorResponse");
+const userSuccess = require("./res/userSuccess");
+const userErrors = require("./res/userError");
 const tag = "user-Controller";
 
 const registerController = async ({
@@ -12,134 +13,190 @@ const registerController = async ({
   email,
 }) => {
   try {
-    let check = await authmodal.findOne({ email: email });
-    if (check != null) {
-      let update = await authmodal.findOneAndUpdate(
-        { email: email },
-        { username, password, mobile, role, email }
+    let checked = await check({ email, modal: AuthModal });
+    console.log(checked);
+    if (checked) {
+      return await updated(
+        { email },
+        { username, password, mobile, role, email },
+        { modal: AuthModal }
       );
-
-      return {
-        message: "email already is there details updates",
-        status: "update",
-        update,
-      };
     }
+    let payload = { username, password, mobile, role, email };
 
-    let user = await authmodal.create({
-      username,
-      password,
-      mobile,
-      role,
-      email,
-    });
-
-    return { message: "successfull ", user, status: "success" };
-
+    return await created({ modal: AuthModal }, { values: payload });
   } catch (error) {
     console.log(`[${tag}]-registerController`, error);
-    throw new errorResponse("unknown error", 500);
+    return userErrors.internalError();
   }
 };
 
 const loginController = async ({ email, password }) => {
   try {
-    let user = await AuthModal.findOne({
-      email: email,
-    });
-    if (user != null && user.password == password) {
-      let token = generateToken(user._id);
-      let payload = { role: user.role };
-      return { message: "successful", payload, token, status: "success" };
+    let checked = await get(email, AuthModal);
+
+    if (checked && checked.password == password) {
+      let token = generateToken(checked._id);
+      let payload = { role: checked.role };
+      let data = { token, payload };
+
+      return user({ data: data });
     }
-    
-    throw new errorResponse("unauthorized user", 400);
+
+    return userErrors.unauthorized();
   } catch (error) {
     console.log(`[${tag}]-loginController`, error);
-    throw new errorResponse("unknown error", 500);
+    return userErrors.internalError();
   }
 };
 
-
 const useralldatacontroller = async ({ pageno, limit }) => {
   try {
-    let alldata = await authmodal
-      .find()
-      .skip(pageno * limit)
-      .limit(limit);
+    let alldata = await paginatedata({ modal: AuthModal, limit, pageno });
 
-    let total = await authmodal.countDocuments();
+    let total = await count(AuthModal);
 
-    if (alldata === null) throw new errorResponse("not found", 404);
-    return {
-      message: "successfull",
-      user: alldata,
-      total,
-      status: "success",
-    };
+    if (alldata === null) return userErrors.notFound();
+    let data = { user: alldata, total };
+    return userSuccess.Success({ data });
   } catch (error) {
     console.log(`[${tag}]-useralldatacontroller`, error);
-    throw new errorResponse("unknown error", 500);
+    return userErrors.internalError();
   }
 };
 
 let userdeletecontroller = async (id) => {
   try {
-    let deleted = await authmodal.findByIdAndDelete(id);
-    return { message: "USER_DELETE", deleted, status: "success" };
+    let deletes = await deleted({ id, modal: AuthModal });
+
+    return userSuccess.Success({ data: deletes });
   } catch (error) {
     console.log(`[${tag}]-userdeletecontroller`, error);
-    throw new errorResponse("unknown error", 500);
+    return userErrors.internalError();
   }
 };
-
 
 let getindividualuser = async ({ id }) => {
   try {
     let user = await authmodal.findById(id);
 
-    if (user === null) throw new errorResponse("not found", 404);
-    return { message: "successfull", user: user, status: "success" };
+    if (user === null) return userErrors.notFound();
+
+    return userSuccess.Success({ data: user });
   } catch (error) {
     console.log(`[${tag}]-getindividualuser`, error);
-    throw new errorResponse("unknown error", 500);
+    return userErrors.internalError();
   }
 };
-
 
 let induserupdatecontroller = async ({ id, data }) => {
   try {
-    let updated = await authmodal.findById(id).update(data);
+    let updatedd = await authmodal.findById(id).update(data);
 
-    if (updated === null) throw new errorResponse("not found", 404);
+    if (updated === null) return userErrors.notFound();
 
-    return { message: "SUCCESSFUL", updated, status: "success" };
+    return userSuccess.UpdateSuccess({ data: updatedd });
   } catch (error) {
     console.log(`[${tag}]-induserupdatecontroller`, error);
-    throw new errorResponse("unknown error", 500);
+    return userErrors.internalError();
   }
 };
-
 
 const newUserPasswordController = async ({ email, password }) => {
   try {
-    let check = await AuthModal.findOne({ email: email });
+    let checked = await get(email, AuthModal);
 
-    if (check != null && check.useredit === true) {
-      let user = await AuthModal.findOneAndUpdate(
-        { email: email },
-        { password: password, useredit: false }
+    if (checked && checked.useredit === true) {
+      let find = { email };
+      let payload = { email, password, useredit: false };
+
+      let user = await updated(
+        { find },
+        { values: payload },
+        { modal: AuthModal }
       );
-      return { message: "SUCCESSFUL", user, status: "success" };
-    }
 
-    throw new errorResponse("your not a registered person", 400);
+      return user
+    }
+    return userErrors.unable()
   } catch (error) {
     console.log(`[${tag}]-newUserPasswordController`, error);
-    throw new errorResponse("unknown error", 500);
+    return userErrors.internalError();
   }
 };
 
+//TODO helper functions
+const check = async ({ email, modal }) => {
+  try {
+    let user = await modal.findOne({ email: email });
+
+    if (user === null) return false;
+    return true;
+  } catch (error) {
+    console.log(`[${tag}]-check`, error);
+    return false;
+  }
+};
+const get = async (email, modal) => {
+  try {
+    let user = await modal.findOne({ email: email }).select("+password");
+
+    if (user === null) return false;
+    return user;
+  } catch (error) {
+    console.log(`[${tag}]-check`, error);
+    return false;
+  }
+};
+
+let updated = async ({ find }, { values }, { modal }) => {
+  try {
+    console.log(find, values);
+    let update = await modal.findOneAndUpdate(find, values);
+
+    return userSuccess.UpdateSuccess({ data: update });
+  } catch (error) {
+    console.log(`[${tag}]-updated`, error);
+  }
+};
+
+let created = async ({ modal }, { values }) => {
+  try {
+    console.log(values);
+    let user = await modal.create(values);
+
+    return userSuccess.Success({ data: user });
+  } catch (error) {
+    console.log(`[${tag}]-created`, error);
+  }
+};
+let count = async (modal) => {
+  try {
+    let total = await modal.countDocuments();
+    return total;
+  } catch (error) {
+    console.log(`[${tag}]-count`, error);
+  }
+};
+let paginatedata = async ({ modal, limit, pageno }) => {
+  try {
+    let data = await modal
+      .find()
+      .skip(pageno * limit)
+      .limit(limit);
+    return data;
+  } catch (error) {
+    console.log(`[${tag}]-paginatedata`, error);
+  }
+};
+const deleted = async ({ id, modal }) => {
+  try {
+    let deleteuser = await modal.findByIdAndDelete(id);
+    return deleteuser;
+  } catch (error) {
+    console.log(`[${tag}]-deleted`, error);
+  }
+};
 
 module.exports = {
   useralldatacontroller,
