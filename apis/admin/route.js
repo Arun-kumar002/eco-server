@@ -1,17 +1,16 @@
 const routes = require("express").Router();
-const { validateAdmin, addAdmin } = require("./service");
+const adminServices= require("./service");
 const { loginSchema } = require("../../helpers/validators/validationHelper");
-
 const baseRoute = "admin";
 
 
 //@access private --method-POST
 //url=http://localhost:5000/auth/admin/login
-routes.post(`/${baseRoute}/login`, loginSchema, validateAdmin);
+routes.post(`/${baseRoute}/login`, loginSchema, adminServices.validateAdmin);
 
 //@access private --method-POST
 //url=http://localhost:5000/auth/admin
-routes.post(`/${baseRoute}`, addAdmin);
+routes.post(`/${baseRoute}`, adminServices.addAdmin);
 
 
 //TODO exporting all routes

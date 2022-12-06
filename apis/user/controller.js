@@ -1,6 +1,7 @@
 const { generateToken } = require("../../helpers/generaterandonHelpers");
 const AuthModal = require("./Models/AuthModal");
 const authmodal = require("./Models/AuthModal");
+const errorResponse = require("../../utils/errorResponse");
 const tag = "user-Controller";
 
 const registerController = async ({
@@ -32,10 +33,12 @@ const registerController = async ({
       role,
       email,
     });
+
     return { message: "successfull ", user, status: "success" };
+
   } catch (error) {
     console.log(`[${tag}]-registerController`, error);
-    return { message: "unknown error", status: "error" };
+    throw new errorResponse("unknown error", 500);
   }
 };
 
@@ -49,13 +52,14 @@ const loginController = async ({ email, password }) => {
       let payload = { role: user.role };
       return { message: "successful", payload, token, status: "success" };
     }
-
-    return { message: "unauthorized user", status: "error" };
+    
+    throw new errorResponse("unauthorized user", 400);
   } catch (error) {
     console.log(`[${tag}]-loginController`, error);
-    return { message: "unknown error", status: "error" };
+    throw new errorResponse("unknown error", 500);
   }
 };
+
 
 const useralldatacontroller = async ({ pageno, limit }) => {
   try {
@@ -66,20 +70,16 @@ const useralldatacontroller = async ({ pageno, limit }) => {
 
     let total = await authmodal.countDocuments();
 
-    let response =
-      alldata === null
-        ? { message: "not found", status: "error" }
-        : {
-            message: "successfull",
-            user: alldata,
-            total,
-            status: "success",
-          };
-
-    return response;
+    if (alldata === null) throw new errorResponse("not found", 404);
+    return {
+      message: "successfull",
+      user: alldata,
+      total,
+      status: "success",
+    };
   } catch (error) {
     console.log(`[${tag}]-useralldatacontroller`, error);
-    return { message: "unknown error", status: "error" };
+    throw new errorResponse("unknown error", 500);
   }
 };
 
@@ -89,45 +89,41 @@ let userdeletecontroller = async (id) => {
     return { message: "USER_DELETE", deleted, status: "success" };
   } catch (error) {
     console.log(`[${tag}]-userdeletecontroller`, error);
-    return { message: "unknown error", status: "error" };
+    throw new errorResponse("unknown error", 500);
   }
 };
+
 
 let getindividualuser = async ({ id }) => {
   try {
     let user = await authmodal.findById(id);
 
-    let response =
-      user !== null
-        ? { message: "successfull", user: user, status: "success" }
-        : { message: "unknown error", status: "erroe" };
-
-    return response;
+    if (user === null) throw new errorResponse("not found", 404);
+    return { message: "successfull", user: user, status: "success" };
   } catch (error) {
     console.log(`[${tag}]-getindividualuser`, error);
-    return { message: "unknown error", status: "error" };
+    throw new errorResponse("unknown error", 500);
   }
 };
+
 
 let induserupdatecontroller = async ({ id, data }) => {
   try {
     let updated = await authmodal.findById(id).update(data);
 
-    let response =
-      updated === null
-        ? { message: "SOMETHING", status: "error" }
-        : { message: "SUCCESSFUL", updated, status: "success" };
-    return response;
+    if (updated === null) throw new errorResponse("not found", 404);
+
+    return { message: "SUCCESSFUL", updated, status: "success" };
   } catch (error) {
     console.log(`[${tag}]-induserupdatecontroller`, error);
-    return { message: "unknown error", status: "error" };
+    throw new errorResponse("unknown error", 500);
   }
 };
+
 
 const newUserPasswordController = async ({ email, password }) => {
   try {
     let check = await AuthModal.findOne({ email: email });
-    console.log("im");
 
     if (check != null && check.useredit === true) {
       let user = await AuthModal.findOneAndUpdate(
@@ -136,12 +132,14 @@ const newUserPasswordController = async ({ email, password }) => {
       );
       return { message: "SUCCESSFUL", user, status: "success" };
     }
-    return { message: "your not a registered person", status: "error" };
+
+    throw new errorResponse("your not a registered person", 400);
   } catch (error) {
     console.log(`[${tag}]-newUserPasswordController`, error);
-    return { message: "unknown error", status: "error" };
+    throw new errorResponse("unknown error", 500);
   }
 };
+
 
 module.exports = {
   useralldatacontroller,

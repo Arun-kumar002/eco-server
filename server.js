@@ -9,6 +9,7 @@ const { PORT } = require("./config/index");
 const adminRoutes = require("./apis/admin/route");
 const userRoute = require("./apis/user/route");
 const notfound = require("./routes/notfoundroute");
+const errorHandler = require("./utils/errorHandler");
 
 //!middleware section
 app.use(express.json());
@@ -19,7 +20,7 @@ app.use(morgan("dev"));
 app.use("/", userRoute);
 app.use("/auth", adminRoutes);
 app.use("/", notfound);
-
+app.use(errorHandler);
 //!server section
 connectDb();
 app.listen(PORT, (_) => {
