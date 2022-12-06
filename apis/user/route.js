@@ -14,10 +14,10 @@ routes.post(`/${baseRoute}`, validationSchema.registerSchema, userService.create
 //@access private --method-POST
 //url=http://localhost:5000/user/login
 routes.post(`/${baseRoute}/login`, validationSchema.loginSchema, userService.validateUser);
-//@access private --method-POST
+//@access private --method-PUT
 //url=http://localhost:5000/user/setpassword
 routes.put(`/${baseRoute}/setpassword`,validationSchema.loginSchema, userService.setPassword);
-//@access private --method-put
+//@access private --method-PUT
 //url=http://localhost:5000/user/:id
 routes.put(`/${baseRoute}/:id`, validationSchema.registerSchema,userService.userUpdate);
 //@access privat --method-delete

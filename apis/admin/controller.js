@@ -11,20 +11,27 @@ const validateAdmin = async ({ email, password, res }) => {
   try {
     let user = await get(email, AdminModel);
 
-    if (user && user.password === password) {
-      let token = generateToken(user._id);
-      let payload = { role: user.role };
-      let data = { payload, token };
-      return { message: "successfull", data, status: "success", code: 200 };
+    if (user && user.password !== password) {
+      res.status(400).json({
+        message: "your not a authorized person",
+        status: "error",
+        code: 400,
+      });
     }
-    res.status(400).json({
-      message: "your not a authorized person",
-      status: "error",
-      code: 400,
-    });
+
+    let token = generateToken(user._id);
+    let payload = { role: user.role };
+    let data = { payload, token };
+
+    res
+      .status(200)
+      .json({ message: "successfull", data, status: "success", code: 200 });
+      
   } catch (error) {
     console.log(`[${tag}]-validateAdmin`, error);
-    return { message: "internal server error", status: "error", code: 500 };
+    res
+      .status(500)
+      .json({ message: "internal server error", status: "error", code: 500 });
   }
 };
 

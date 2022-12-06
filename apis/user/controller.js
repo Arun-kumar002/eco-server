@@ -15,6 +15,7 @@ const createUser = async ({ username, password, mobile, role, email }) => {
         { modal: AuthModal }
       );
     }
+
     let payload = { username, password, mobile, role, email };
 
     return await created({ modal: AuthModal }, { values: payload });
@@ -33,7 +34,9 @@ const validateUser = async ({ email, password, res }) => {
       let payload = { role: checked.role };
       let data = { token, payload };
 
-      return { message: "successfull", data, status: "success", code: 200 };
+      res
+        .status(200)
+        .json({ message: "successfull", data, status: "success", code: 200 });
     }
 
     res.status(400).json({
@@ -43,63 +46,85 @@ const validateUser = async ({ email, password, res }) => {
     });
   } catch (error) {
     console.log(`[${tag}]-validateUser`, error);
-    return { message: "internal server error", status: "error", code: 500 };
+    res
+      .status(500)
+      .json({ message: "internal server error", status: "error", code: 500 });
   }
 };
 
-const getAllUsers = async ({ pageno, limit }) => {
+const getAllUsers = async ({ pageno, limit, res }) => {
   try {
     let alldata = await paginatedata({ modal: AuthModal, limit, pageno });
 
     let total = await count(AuthModal);
 
-    if (alldata === null) return userErrors.notFound();
+    if (alldata === null)
+      res.status(404).json({ status: "error", message: "users not found" });
     let data = { user: alldata, total };
-    return { message: "successfull", data, status: "success", code: 200 };
+    res
+      .status(200)
+      .json({ message: "successfull", data, status: "success", code: 200 });
   } catch (error) {
     console.log(`[${tag}]-getAllUsers`, error);
-    return { message: "internal server error", status: "error", code: 500 };
+    res
+      .status(500)
+      .json({ message: "internal server error", status: "error", code: 500 });
   }
 };
 
-let deleteUser = async (id) => {
+let deleteUser = async ({ id, res }) => {
   try {
     let deletes = await deleted({ id, modal: AuthModal });
 
-    return { message: "successfull", deletes, status: "success", code: 200 };
+    res
+      .status(200)
+      .json({ message: "successfull", deletes, status: "success", code: 200 });
   } catch (error) {
     console.log(`[${tag}]-deleteUser`, error);
-    return { message: "internal server error", status: "error", code: 500 };
+    res
+      .status(500)
+      .json({ message: "internal server error", status: "error", code: 500 });
   }
 };
 
-let getUser = async ({ id }) => {
+let getUser = async ({ id, res }) => {
   try {
     let user = await authmodal.findById(id);
 
     if (user === null)
-      return { message: "unable to update", status: "error", code: 400 };
+      res
+        .status(400)
+        .json({ message: "unable to update", status: "error", code: 400 });
 
-    return { message: "successfull", user, status: "success", code: 200 };
+    res
+      .status(200)
+      .json({ message: "successfull", user, status: "success", code: 200 });
   } catch (error) {
     console.log(`[${tag}]-getUser`, error);
-    return { message: "internal server error", status: "error", code: 500 };
+    res
+      .status(500)
+      .json({ message: "internal server error", status: "error", code: 500 });
   }
 };
 
 let userUpdate = async ({ id, data, res }) => {
   try {
     let updated = await authmodal.findById(id).update(data);
+    console.log("im here");
 
     if (updated === null)
       res
         .status(400)
         .json({ message: "unable to update", status: "error", code: 400 });
 
-    return { message: "successfull", updated, status: "success", code: 200 };
+    res
+      .status(200)
+      .json({ message: "successfull", updated, status: "success", code: 200 });
   } catch (error) {
     console.log(`[${tag}]-userUpdate`, error);
-    return { message: "internal server error", status: "error", code: 500 };
+    res
+      .status(500)
+      .json({ message: "internal server error", status: "error", code: 500 });
   }
 };
 
@@ -107,7 +132,12 @@ const setPassword = async ({ email, password, res }) => {
   try {
     let checked = await get(email, AuthModal);
 
-    if (checked && checked.useredit === true) {
+    if (checked && checked.useredit !== true) {
+      res
+        .status(400)
+        .json({ message: "unable to update", status: "error", code: 400 });
+        return
+    } 
       let find = { email };
       let payload = { email, password, useredit: false };
 
@@ -117,14 +147,15 @@ const setPassword = async ({ email, password, res }) => {
         { modal: AuthModal }
       );
 
-      return user;
-    }
-    res
-      .status(400)
-      .json({ message: "unable to update", status: "error", code: 400 });
+      res
+        .status(202)
+        .json({ message: "password updated", status: "success", user });
+    
   } catch (error) {
     console.log(`[${tag}]-setPassword`, error);
-    return { message: "internal server error", status: "error", code: 500 };
+    res
+      .status(500)
+      .json({ message: "internal server error", status: "error", code: 500 });
   }
 };
 
@@ -157,7 +188,7 @@ let updated = async ({ find }, { values }, { modal }) => {
     console.log(find, values);
     let update = await modal.findOneAndUpdate(find, values);
 
-    return userSuccess.UpdateSuccess({ data: update });
+    return update;
   } catch (error) {
     console.log(`[${tag}]-updated`, error);
   }
