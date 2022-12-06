@@ -2,23 +2,26 @@ const { generateToken } = require("../../helpers/generaterandonHelpers");
 const AuthModal = require("./Models/AuthModal");
 const authmodal = require("./Models/AuthModal");
 const userSuccess = require("./res/userSuccess");
-const userErrors = require("./res/userError");
 const tag = "user-Controller";
 
-const createUser = async ({ username, password, mobile, role, email }) => {
+const createUser = async ({ username, password, mobile, role, email ,res}) => {
   try {
     let checked = await check({ email, modal: AuthModal });
     if (checked) {
-      return await updated(
+      let update= await updated(
         { email },
         { username, password, mobile, role, email },
         { modal: AuthModal }
       );
+      res.status(202).json({message:'user updated',status:'success',update})
     }
 
     let payload = { username, password, mobile, role, email };
 
-    return await created({ modal: AuthModal }, { values: payload });
+    let user=await created({ modal: AuthModal }, { values: payload });
+    res.status(200).json({message:'successfull',status:'success',user})
+
+
   } catch (error) {
     console.log(`[${tag}]-createUser`, error);
     return { message: "internal server error", status: "error", code: 500 };
@@ -159,6 +162,8 @@ const setPassword = async ({ email, password, res }) => {
   }
 };
 
+
+
 //TODO helper functions
 const check = async ({ email, modal }) => {
   try {
@@ -185,7 +190,6 @@ const get = async (email, modal) => {
 
 let updated = async ({ find }, { values }, { modal }) => {
   try {
-    console.log(find, values);
     let update = await modal.findOneAndUpdate(find, values);
 
     return update;
@@ -196,14 +200,14 @@ let updated = async ({ find }, { values }, { modal }) => {
 
 let created = async ({ modal }, { values }) => {
   try {
-    console.log(values);
     let user = await modal.create(values);
-
-    return userSuccess.Success({ data: user });
+    
+    return user
   } catch (error) {
     console.log(`[${tag}]-created`, error);
   }
 };
+
 let count = async (modal) => {
   try {
     let total = await modal.countDocuments();

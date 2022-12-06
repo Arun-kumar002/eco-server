@@ -18,10 +18,10 @@ let createUser = async (req, res) => {
       mobile,
       role,
       email,
+      res
     });
 
-    res.status(200).json(user);
-    
+
   } catch (error) {
     console.log(`[${tag}] createUser:`, error);
 
@@ -78,6 +78,7 @@ let deleteUser = async (req, res) => {
     let id = req.params.id;
 
     await userController.deleteUser({ id, res });
+
   } catch (error) {
     console.log(`[${tag}] deleteUser:`, error);
 
@@ -95,7 +96,8 @@ let getUser = async (req, res) => {
     }
 
     let id = req.params.id;
-    let user = await userController.getUser({ id, res });
+ await userController.getUser({ id, res });
+
   } catch (error) {
     console.log(`[${tag}] getUser:`, error);
 
