@@ -7,7 +7,6 @@ const tag = "user-Controller";
 
 const createUser = async ({ username, password, mobile, role, email }) => {
   let checked = await isUserExist({ email, modal: AuthModal });
-  console.log(checked);
   if (checked) {
     return await updatingExistingUser(
       { email },
@@ -64,6 +63,7 @@ let getUser = async ({ id }) => {
 };
 
 let userUpdate = async ({ id, data }) => {
+  
   let updated = await authmodal.findById(id).update(data);
 
   if (updated === null)
@@ -108,14 +108,15 @@ let updatingExistingUser = async ({ find }, { values }, { modal }) => {
   console.log(find, values);
   let update = await modal.findOneAndUpdate(find, values);
 
-  return userSuccess.UpdateSuccess({ data: update });
+  return {message:'updated successfully', data: update ,status:'success'};
 };
 
 let creatingNewUser = async ({ modal }, { values }) => {
   console.log(values);
   let user = await modal.create(values);
 
-  return userSuccess.Success({ data: user });
+  return {message:'created successfully', data: user ,status:'success'};
+
 };
 let countingDbDocuments = async (modal) => {
   let total = await modal.countDocuments();
