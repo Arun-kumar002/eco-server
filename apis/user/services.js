@@ -134,7 +134,7 @@ exports.fetchUserId = async (req, res) => {
     const { email } = req.body;
     const user = await userControllers.getUserByEmailId( email);
 
-    res.status(200).json({ message: "successfull", status: "success", user });
+    res.status(200).json({ message: "successfull", status: "success", user:user._id });
 
   } catch (error) {
     console.log(`[${tag}] fetchUserId:`, error);

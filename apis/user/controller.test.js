@@ -85,7 +85,7 @@ exports.getUserByEmailId = async (email) => {
   const user = await UserModel.findOne({ email });
 
   if (user === null) {
-    throw new UserErrors.UserNotFoundError()
+    throw new UserErrors(404, "user not found ");
   }
 
   return user;
