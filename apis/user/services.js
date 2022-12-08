@@ -11,7 +11,7 @@ exports.createUser = async (req, res) => {
     }
     const user = await userControllers.create(req.body);
 
-    res.status(200).json({ user, message: "successfull", status: "success" });
+    res.status(200).json({ user:user.userName, message: "successfull", status: "success" });
   } catch (error) {
     console.log(`[${tag}] createUser:`, error);
 

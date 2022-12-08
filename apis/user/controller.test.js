@@ -1,98 +1,114 @@
-const { default: mongoose } = require("mongoose");
-const { generateToken } = require("../../helpers/generaterandonHelpers");
-const UserModel = require("./Models/UserModal");
-const UserErrors = require("./error/userErrors");
+const userControllers = require("./controller");
+const { connectDb } = require("../../config/db");
+const { generateRandomString } = require("../../helpers/generaterandonHelpers");
 
-exports.create = async ({ userName, password, mobile, role, email }) => {
-  let existsUser = await UserModel.findOne({ email: email });
+describe("[userController]: create", () => {
+  
+  const inputs = {
+    userName: "testing-jest",
+    password: "test123",
+    mobile: "8610159926",
+    role: "user",
+    email: `${generateRandomString(10)}@gmail.com`,
+  };
 
-  if (existsUser) {
-    throw new UserErrors.UserExistsError();
-  }
+  connectDb();
 
-  let user = await UserModel.create({
-    userName,
-    password,
-    mobile,
-    role,
-    email,
+  test("it should  create a new user", async () => {
+
+    const user = await userControllers.create(inputs);
+
+    await expect(user.email).toBe(inputs.email);
   });
-  return { user: user };
-};
 
-exports.validate = async ({ email, password }) => {
-  const user = await UserModel.findOne({ email }).select("+password");
+  test("it should return error message for the same mail id", async () => {
 
-  if (user === null) {
-    throw new UserErrors.UserNotFoundError();
-  }
+    try {
 
-  if (user.password !== password) {
-    throw new UserErrors.UserPasswordError();
-  }
+      await userControllers.create(inputs);
 
-  const token = generateToken(user._id);
+    } catch (error) {
 
-  return { token: token };
-};
-exports.getAll = async ({ skip, limit, getCount, name, email }) => {
-  let query = {};
+      await expect(error.message).toBe("user email id already exist");
+    }
+  });
 
-  if (name) {
-    query.userName = { $regex: name };
-  }
+  test("it should create a user without role", async () => {
 
-  if (email) {
-    query.email = email;
-  }
-  let count = undefined;
-  if (getCount == true) {
-    count = await UserModel.count(query);
-  }
-  const users = await UserModel.find(query)
-    .skip(skip * limit)
-    .limit(limit);
+    const withOutrole = {
+      userName: "testing",
+      mobile: "8610159926",
+      email: `${generateRandomString(10)}@gmail.com`,
+      password: "arun123",
+    };
 
-  return { users: users || [], count: count };
-};
+    const users = await userControllers.create(withOutrole);
 
-exports.deleteById = async (id) => {
-  const deleteuser = await UserModel.findByIdAndDelete(id);
+    await expect(users.role).toBe("user");
+  });
 
-  if (deleteuser === null) {
-    throw new UserErrors.UserDeleteError();
-  }
+  test("it should create a user without promptPasswordChange", async () => {
 
-  return deleteuser;
-};
+    const withOutpromptPasswordChange = {
+      userName: "testing",
+      mobile: "8610159926",
+      role: "user",
+      email: `${generateRandomString(10)}@gmail.com`,
+    };
 
-exports.updateById = async ({
-  id,
-  userName,
-  email,
-  mobile,
-  password,
-  role,
-}) => {
-  const user = await (
-    await this.getById(id)
-  ).updateOne({ userName, email, mobile, password, role }, { new: true });
+    const users = await userControllers.create(withOutpromptPasswordChange);
 
-  return user;
-};
+    await expect(users.promptPasswordChange).toBe(true);
+  });
+});
 
-exports.getUserByEmailId = async (email) => {
-  const user = await UserModel.findOne({ email });
+describe("[userController] validateuser", () => {
 
-  if (user === null) {
-    throw new UserErrors(404, "user not found ");
-  }
+  test("it should return successs if the credentials are correct", async () => {
 
-  return user;
-};
+    const credentials = {
+      email: "harish@gmail.com",
+      password: "harish123",
+    };
 
-exports.getById = async (id) => {
-  const user = await UserModel.findOne({ _id: id });
+    const user = await userControllers.validate(credentials);
+ 
+    expect(user.true).toBe(true);
 
-  return user;
-};
+  });
+
+  test("it should return password missmatch error for entering wrong password", async () => {
+
+    const credentials = {
+      email: "harish@gmail.com",
+      password: "harish13",
+    };
+
+    try {
+
+      await userControllers.validate(credentials);
+
+    } catch (error) {
+      expect(error.message).toBe("password mismatch");
+    }
+  });
+
+  test("it should return user not found for entering wrong email", async () => {
+
+    const credentials = {
+      email: "harish1000@gmail.com",
+      password: "harish123",
+    };
+
+    try {
+
+      await userControllers.validate(credentials);
+
+    } catch (error) {
+
+      expect(error.message).toBe("user not found");
+    }
+  });
+});
+
+

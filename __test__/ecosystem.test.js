@@ -78,15 +78,7 @@ describe("user test", () => {
     });
   });
 
-  describe("/user update ", () => {
-    it("it should return 400 for wrong id", async () => {
-      let id = "6390723404412d860821ef6r";
-      await supertest(app)
-        .put(`/${baseRoute}` + `/${id}`)
-        .send({ ...inputs })
-        .expect(400);
-    });
-  });
+
 
   //TODO delete request
   //http://localhost:5000/user/6390725d04412d860821ef72
@@ -105,13 +97,7 @@ describe("user test", () => {
     });
   });
 
-  describe("/user delete", () => {
-    it("it should return 400 for id is wrong", async () => {
-      await supertest(app)
-        .delete(`/${baseRoute}/6390723404412d860821ef6r`)
-        .expect(400);
-    });
-  });
+
 
   //http:localhost:5000/*
   describe("/not found routes", () => {

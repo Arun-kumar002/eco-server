@@ -1,4 +1,3 @@
-const { default: mongoose } = require("mongoose");
 const { generateToken } = require("../../helpers/generaterandonHelpers");
 const UserModel = require("./Models/UserModal");
 const UserErrors = require("./error/userErrors");
@@ -17,7 +16,8 @@ exports.create = async ({ userName, password, mobile, role, email }) => {
     role,
     email,
   });
-  return { user: user };
+
+  return user;
 };
 
 exports.validate = async ({ email, password }) => {
@@ -33,22 +33,24 @@ exports.validate = async ({ email, password }) => {
 
   const token = generateToken(user._id);
 
-  return { token: token };
+  return { token: token, true: true };
 };
 exports.getAll = async ({ skip, limit, getCount, name, email }) => {
   let query = {};
 
   if (name) {
-    query.userName = { $regex: name };
+    query.userName = { $regex: name, $options: "g" };
   }
 
   if (email) {
     query.email = email;
   }
+  
   let count = undefined;
   if (getCount == true) {
     count = await UserModel.count(query);
   }
+
   const users = await UserModel.find(query)
     .skip(skip * limit)
     .limit(limit);
@@ -85,7 +87,7 @@ exports.getUserByEmailId = async (email) => {
   const user = await UserModel.findOne({ email });
 
   if (user === null) {
-    throw new UserErrors.UserNotFoundError()
+    throw new UserErrors.UserNotFoundError();
   }
 
   return user;
