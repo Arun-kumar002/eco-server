@@ -1,145 +1,121 @@
+const { default: mongoose } = require("mongoose");
 const { generateToken } = require("../../helpers/generaterandonHelpers");
-const AuthModal = require("./Models/AuthModal");
-const authmodal = require("./Models/AuthModal");
-const userSuccess = require("./res/userSuccess");
-const userErrors = require("./res/userError");
-const tag = "user-Controller";
+const UserModel = require("./Models/UserModal");
+const UserErrors = require("./error/userErrors");
 
-const createUser = async ({ username, password, mobile, role, email }) => {
-  let checked = await isUserExist({ email, modal: AuthModal });
-  if (checked) {
-    return await updatingExistingUser(
-      { email },
-      { username, password, mobile, role, email },
-      { modal: AuthModal }
-    );
-  }
-  let payload = { username, password, mobile, role, email };
+exports.create = async ({ userName, password, mobile, role, email }) => {
+  console.log('im');
+  let existsUser = await UserModel.findOne({ email: email });
 
-  return await creatingNewUser({ modal: AuthModal }, { values: payload });
-};
-
-const validateUser = async ({ email, password }) => {
-  let checked = await fetchingExisingUser(email, AuthModal);
-
-  if (checked && checked.password == password) {
-    let token = generateToken(checked._id);
-    let payload = { role: checked.role };
-    let data = { token, payload };
-
-    return { message: "successfull", data, status: "success", code: 200 };
+  if (existsUser) {
+    throw new UserErrors.UserExistsError();
   }
 
-  throw new Error({
-    message: "your not a authorized person",
-    status: "error",
-    code: 400,
+  let user=await UserModel.create({
+    userName,
+    password,
+    mobile,
+    role,
+    email,
   });
+  return {user:user}
 };
 
-const getAllUsers = async ({ pageno, limit }) => {
-  let alldata = await paginatedUserData({ modal: AuthModal, limit, pageno });
+exports.validate = async ({ email, password }) => {
+  const user = await UserModel.findOne({ email }).select("+password");
 
-  let total = await countingDbDocuments(AuthModal);
-
-  if (alldata === null) return userErrors.notFound();
-  let data = { user: alldata, total };
-  return { message: "successfull", data, status: "success", code: 200 };
-};
-
-let deleteUser = async (id) => {
-  let deletes = await deletingExistingUser({ id, modal: AuthModal });
-
-  return { message: "successfull", deletes, status: "success", code: 200 };
-};
-
-let getUser = async ({ id }) => {
-  let user = await authmodal.findById(id);
-
-  if (user === null)
-    return { message: "unable to update", status: "error", code: 400 };
-
-  return { message: "successfull", user, status: "success", code: 200 };
-};
-
-let userUpdate = async ({ id, data }) => {
-  
-  let updated = await authmodal.findById(id).update(data);
-
-  if (updated === null)
-    return { message: "unable to update", status: "error", code: 400 };
-
-  return { message: "successfull", updated, status: "success", code: 200 };
-};
-
-const setPassword = async ({ email, password }) => {
-  let checked = await fetchingExisingUser(email, AuthModal);
-
-  if (checked && checked.useredit === true) {
-    let find = { email };
-    let payload = { email, password, useredit: false };
-
-    let user = await updatingExistingUser(
-      { find },
-      { values: payload },
-      { modal: AuthModal }
-    );
-
-    return user;
+  if (user === null) {
+    throw new UserErrors.UserNotFoundError();
   }
-  return { message: "unable to update", status: "error", code: 400 };
+
+  if (user.password !== password) {
+    throw new UserErrors.UserPasswordError();
+  }
+
+  const token = generateToken(user._id);
+
+  return {  token:token };
 };
+exports.getAll = async ({ skip, limit, getCount, name, email }) => {
+  let query = {};
 
-//TODO helper functions
-const isUserExist = async ({ email, modal }) => {
-  let user = await modal.findOne({ email: email });
+  if (name) {
+    query.userName = { $regex: name };
+  }
 
-  if (user === null) return false;
-  return true;
-};
-const fetchingExisingUser = async (email, modal) => {
-  let user = await modal.findOne({ email: email }).select("+password");
-
-  if (user === null) return false;
-  return user;
-};
-
-let updatingExistingUser = async ({ find }, { values }, { modal }) => {
-  console.log(find, values);
-  let update = await modal.findOneAndUpdate(find, values);
-
-  return {message:'updated successfully', data: update ,status:'success'};
-};
-
-let creatingNewUser = async ({ modal }, { values }) => {
-  console.log(values);
-  let user = await modal.create(values);
-
-  return {message:'created successfully', data: user ,status:'success'};
-
-};
-let countingDbDocuments = async (modal) => {
-  let total = await modal.countDocuments();
-  return total;
-};
-let paginatedUserData = async ({ modal, limit, pageno }) => {
-  let data = await modal
-    .find()
-    .skip(pageno * limit)
+  if (email) {
+    query.email = email;
+  }
+  let count = undefined;
+  if (getCount == true) {
+    count = await UserModel.count(query);
+  }
+  const users = await UserModel.find(query)
+    .skip(skip * limit)
     .limit(limit);
-  return data;
+
+  return { users: users || [], count: count };
 };
-const deletingExistingUser = async ({ id, modal }) => {
-  let deleteuser = await modal.findByIdAndDelete(id);
+
+exports.deleteById = async (id) => {
+
+  const isValid = mongoose.Types.ObjectId.isValid(id);
+
+  if (!isValid) {
+    throw new UserErrors.UserIdInvalid();
+  }
+
+  const deleteuser = await UserModel.findByIdAndDelete(id);
+
+  if (deleteuser === null) {
+    throw new UserErrors.UserDeleteError();
+  }
+
   return deleteuser;
 };
 
-module.exports = {
-  createUser,
-  validateUser,
-  getAllUsers,
-  deleteUser,
-  getUser,
-  userUpdate,
-  setPassword,
+exports.updateById = async ({
+  id,
+  userName,
+  email,
+  mobile,
+  password,
+  role,
+}) => {
+
+  const user = await (
+    await getById(id)
+  ).updateOne({ userName, email, mobile, password, role }, { new: true });
+
+  return user;
 };
+
+exports.getUserByEmailId = async (email) => {
+
+  let user = await UserModel.findOne({ email });
+
+  if (user === null) {
+    throw new UserErrors(404, "user not found ");
+  }
+
+  return user._id;
+
+};
+
+const getById=exports.getById= async (id) => {
+
+  const isValid = mongoose.Types.ObjectId.isValid(id);
+  if (!isValid) {
+    throw new UserErrors.UserIdInvalid();
+  }
+
+  let user = await UserModel.findOne({ _id: id });
+
+  if (user === null) {
+    throw new UserErrors.UserExistsError();
+  }
+ 
+
+  return user;
+};
+

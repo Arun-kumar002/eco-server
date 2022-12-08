@@ -16,7 +16,7 @@ const AdminSchmema = new Schema(
       enum: ["admin"],
     },
   },
-  { timestamps: true }
+  { timestamps: true,collection:'adminusers' }   //collections
 );
 
 module.exports = model("AdminUser", AdminSchmema);

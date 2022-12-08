@@ -7,20 +7,18 @@ const app = express();
 const { connectDb } = require("./config/db");
 const { PORT } = require("./config/index");
 const adminRoutes = require("./apis/admin/route");
-const userRoute = require("./apis/user/route");
-const notfound = require("./routes/notfoundroute");
-const errorHandler = require("./utils/errorHandler");
+const userRoutes = require("./apis/user/route");
+const notFoundRoutes = require("./routes/notfoundroute");
 
 //!middleware section
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(express.json({limit:'10mb'}));
+app.use(express.urlencoded({ extended: true,limit:'50mb' }));
+app.use(cors({ /* origin & methods*/}));
 app.use(morgan("dev"));
 //!mount here
-app.use("/", userRoute);
+app.use("/", userRoutes);
 app.use("/auth", adminRoutes);
-app.use("/", notfound);
-app.use(errorHandler);
+app.use("/", notFoundRoutes);
 //!server section
 connectDb();
 app.listen(PORT, (_) => {

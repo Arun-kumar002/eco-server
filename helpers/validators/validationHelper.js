@@ -1,6 +1,6 @@
 const { checkSchema } = require("express-validator");
 const registerSchema = checkSchema({
-  username: {
+  userName: {
     isLength: {
       options: { min: 6, max: 30 },
       errorMessage: "username should be minimum 6 and maximum 30 characters",
@@ -70,7 +70,7 @@ const paginationSchema = checkSchema({
       errorMessage: "limit is required",
     },
   },
-  pageno: {
+  skip: {
     exists: {
       errorMessage: "pageno is required",
     },

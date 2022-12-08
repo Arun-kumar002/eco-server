@@ -1,68 +1,54 @@
 //!local module
 const AdminModel = require("./Models/AdminModel");
 const { generateToken } = require("../../helpers/generaterandonHelpers");
-const errors = require("./res/adminError");
-const success = require("./res/adminSuccess");
-const tag = "admin Controller";
+const AdminErrors = require("./error/adminErrors");
+
 //!local ends
 
-const validateAdmin = async ({ email, password }) => {
-  try {
-    let user = await fetchingExistingUser(email, AdminModel);
-
-    if (user && user.password === password) {
-      let token = generateToken(user._id);
-
-      let payload = { role: user.role };
-      let data = { payload, token };
-
-      return { message: "successfull", data, status: "success", code: 200 };
-    }
-    return {
-      message: "your not a authorized person",
-      status: "error",
-      code: 400,
-    };
-  } catch (error) {
-    console.log(`[${tag}]-logincontroller`, error);
-    return { message: "internal server error", status: "error", code: 500 };
+exports.validate = async ({ email, password }) => {
+  const user = await AdminModel.findOne({ email }).select("+password");
+  if (!user) {
+    throw new AdminErrors.AdminEntityNotFoundError();
   }
+
+  if (user.password !== password) {
+    throw new AdminErrors.AdminPasswordError();
+  }
+
+  const token = generateToken(user._id);
+
+  return { token };
 };
 
-const addAdminUser = async ({ ...data }) => {
-  try {
-    let admins = await creatingNewAdminUser(
-      { modal: AdminModel },
-      { values: { ...data } }
-    );
+exports.create = async ({ email, password }) => {
+  const user = await AdminModel.findOne({ email }).select("+password");
+  if (user) {
+    throw new AdminErrors.AdminExists();
+  }
 
-    return { message: "successfull", admins, status: "success", code: 200 };
-  } catch (error) {
-    console.log(`[${tag}]-admincontroller`, error);
-    return { message: "internal server error", status: "error", code: 500 };
-  }
+  return await AdminModel.create({ email, password });
 };
-//TODO helper funcions
-let creatingNewAdminUser = async ({ modal }, { values }) => {
-  try {
-    let user = await modal.create(values);
 
-    return { message: "successfull ", user, status: "success" };
-  } catch (error) {
-    console.log(`[${tag}]-created`, error);
+exports.update = async ({ email, password }) => {
+  let adminUser = await AdminModel.findOne({ email: email });
+
+  if (adminUser) {
+    let updated = adminUser.updateOne({ password: password });
+    return updated;
   }
+
+  throw new AdminErrors.AdminUpdateError();
 };
-const fetchingExistingUser = async (email, modal) => {
-  try {
-    let user = await modal.findOne({ email: email }).select("+password");
-    if (user === null) return false;
-    return user;
-  } catch (error) {
-    console.log(`[${tag}]-check`, error);
-    return false;
+
+
+exports.deleteAdminUserByEmail = async ({ email }) => {
+
+  let adminUser = await AdminModel.findOne({ email: email });
+  if (adminUser) {
+    await AdminModel.deleteOne({ email });
+    return;
   }
+
+  throw new AdminErrors.UserDeleteError();
 };
-module.exports = {
-  validateAdmin,
-  addAdminUser,
-};
+

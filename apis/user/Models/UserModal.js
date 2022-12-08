@@ -2,25 +2,23 @@ const { Schema, model } = require("mongoose");
 
 const UserSchema = new Schema(
   {
-    username: {
+    userName: {
       type: String,
-      require:true
+      require: true,
     },
     email: {
       type: String,
-      require:true
-
+      require: true,
     },
     mobile: {
       type: String,
-      require:true
-
+      require: true,
     },
     password: {
       type: String,
-      // select:false
+      select: false,
     },
-    useredit: {
+    promptPasswordChange: {
       type: Boolean,
       default: true,
       require: false,
@@ -30,6 +28,6 @@ const UserSchema = new Schema(
       default: "user",
     },
   },
-  { timestamps: true }
+  { timestamps: true,collection:'users'}  // collation: "User" 
 );
-module.exports = model("auth1", UserSchema);
+module.exports = model("User", UserSchema);

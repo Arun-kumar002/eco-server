@@ -1,39 +1,76 @@
 const { validationResult } = require("express-validator");
-const { handleError } = require("../../helpers/handlers/handleerrorHelper");
-const { parseError } = require("../../helpers/validators/validationHelper");
 const authControllers = require("./controller");
 const tag = "admin-service";
-const validateAdmin = async (req, res, next) => {
-  let errorMessage = await validationService(req);
+
+exports.validateAdmin = async (req, res, next) => {
+  const errorMessage = await validationService(req);
   if (errorMessage) {
     return res.status(400).json({ status: "error", message: errorMessage });
   }
 
   try {
-    let { email, password } = req.body;
+    const { email, password } = req.body;
 
-    let admin = await authControllers.validateAdmin({ email, password });
+    const admin = await authControllers.validate({ email, password });
 
-    res.status(200).json(admin);
+    res.status(200).json({ admin, message: "successfull", status: "success" });
   } catch (error) {
     console.log(`[${tag}] validateAdmin:`, error);
 
-    res.status(500).json({ message: "internal error", status: "error" });
+    res
+      .status(error.errorCode)
+      .json({ message: error.message, status: "error" });
   }
 };
 
-const addAdminUser = async (req, res) => {
-  try {
-    let admin = await authControllers.addAdminUser(req.body);
 
-    res.status(200).json(admin);
+exports.addAdminUser = async (req, res) => {
+  try {
+    const admin = await authControllers.create(req.body);
+
+    res
+      .status(200)
+      .json({ admin, message: "successfully added", status: "success" });
   } catch (error) {
     console.log(`[${tag}] addAdminUser:`, error);
 
-    res.status(500).json({ message: "internal error", status: "error" });
+    res
+      .status(error.errorCode)
+      .json({ message: error.message, status: "error" });
   }
 };
 
+
+exports.updateAdminUser = async (req, res) => {
+  try {
+    const admin = await authControllers.update(req.body);
+    res
+      .status(200)
+      .json({ admin, message: "successfully updated", status: "success" });
+  } catch (error) {
+    res
+    .status(error.errorCode)
+    .json({ message: error.message, status: "error" });
+  }
+};
+
+exports.deleteAdminUser = async (req, res) => {
+  try {
+    const { email } = req.query;
+    await authControllers.deleteAdminUserByEmail({ email });
+
+    res.status(200).json({ message: "deleted", status: "success" });
+  } catch (error) {
+    console.log(`[${tag}] deleteAdminUser:`, error);
+
+    res
+      .status(error.errorCode)
+      .json({ message: error.message, status: "error" });
+  }
+};
+
+
+//!service helpers
 const validationService = async (req) => {
   //server side validation
   let errors = validationResult(req);
@@ -47,4 +84,3 @@ const validationService = async (req) => {
   return { [firstError.param]: firstError.msg };
 };
 
-module.exports = { validateAdmin, addAdminUser };

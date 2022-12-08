@@ -2,140 +2,148 @@ const { validationResult } = require("express-validator");
 const userControllers = require("./controller");
 const tag = "user-service";
 
-let createUser = async (req, res) => {
+exports.createUser = async (req, res) => {
   try {
-    let errorMessage = await validationService(req);
+    const errorMessage = await validationService(req);
     if (errorMessage) {
       res.status(400).json({ status: "error", message: errorMessage });
       return;
     }
 
-    let { username, password, mobile, role, email } = req.body;
-    let user = await userControllers.createUser({
-      username,
-      password,
-      mobile,
-      role,
-      email,
-    });
+    const user = await userControllers.create(req.body);
 
-    res.status(200).json(user);
+    res.status(200).json({ user, message: "successfull", status: "success" });
   } catch (error) {
     console.log(`[${tag}] createUser:`, error);
-    res.status(500).json({ message: "internal server error", status: "error" });
+
+    res
+      .status(error.errorCode)
+      .json({ message: error.message, status: "error" });
   }
 };
 
-let validateUser = async (req, res) => {
+exports.validateUser = async (req, res) => {
   try {
-    let errorMessage = await validationService(req);
+    const errorMessage = await validationService(req);
 
     if (errorMessage) {
       return res.status(400).json({ status: "error", message: errorMessage });
     }
 
-    let { email, password } = req.body;
-    let user = await userControllers.validateUser({ email, password, res });
-    res.status(200).json(user);
+    const user = await userControllers.validate({ ...req.body });
+
+    res.status(200).json({ user, message: "successfull", status: "success" });
   } catch (error) {
     console.log(`[${tag}] validateUser:`, error);
-    res.status(500).json({ message: "internal server error", status: "error" });
+    res
+      .status(error.errorCode)
+      .json({ message: error.message, status: "error" });
   }
 };
 
-let getAllUsers = async (req, res) => {
+exports.getAllUsers = async (req, res) => {
   try {
-    let errorMessage = await validationService(req);
+    const errorMessage = await validationService(req);
+
     if (errorMessage) {
       res.status(400).json({ status: "error", message: errorMessage });
       return;
     }
-    let { pageno } = req.query;
-    let { limit } = req.query;
 
-    let users = await userControllers.getAllUsers({ pageno, limit });
-    res.status(200).json({ users });
+    let { skip, limit, getCount, name, email } = req.query;
+
+    const users = await userControllers.getAll({ skip, limit, getCount:JSON.parse(getCount), name, email });
+
+    res
+      .status(200)
+      .json({ users, message: "successfully fetched", status: "success" });
+
   } catch (error) {
     console.log(`[${tag}] getAllUsers:`, error);
-    res.status(500).json({ message: "internal server error", status: "error" });
+    res
+      .status(error.errorCode)
+      .json({ message: error.message, status: "error" });
   }
 };
 
-let deleteUser = async (req, res) => {
+exports.deleteUser = async (req, res) => {
   try {
-    let errorMessage = await validationService(req);
-    if (errorMessage) {
-      res.status(400).json({ status: "error", message: errorMessage });
-      return;
-    }
-    let id = req.params.id;
+    const errorMessage = await validationService(req);
 
-    let user = await userControllers.deleteUser(id);
-    res.status(200).json(user);
+    if (errorMessage)
+      res.status(400).json({ status: "error", message: errorMessage });
+
+    const id = req.params.id;
+ 
+    let user = await userControllers.deleteById({id});
+
+
+    res.status(200).json({user,message:'successfully deleted',status:'success'});
+
   } catch (error) {
     console.log(`[${tag}] deleteUser:`, error);
-    res.status(500).json({ message: "internal server error", status: "error" });
+
+    res.status(error.errorCode).json({ message: error.message, status: "error" });
   }
 };
 
-let getUser = async (req, res) => {
+exports.getUser = async (req, res) => {
   try {
-    let errorMessage = await validationService(req);
+    const errorMessage = await validationService(req);
+
     if (errorMessage) {
       res.status(400).json({ status: "error", message: errorMessage });
       return;
     }
-    let id = req.params.id;
-    let user = await userControllers.getUser({ id });
 
-    res.status(200).json(user);
+    const id = req.params.id;
+    const user = await userControllers.getById( id );
+
+    res.status(200).json({user,message:'successfully fetched',status:'success'});
+
   } catch (error) {
     console.log(`[${tag}] getUser:`, error);
-    res.status(500).json({ message: "internal server error", status: "error" });
+
+    res.status(error.errorCode).json({ message: error.message, status: "error" });
   }
 };
 
-let userUpdate = async (req, res) => {
+exports.userUpdate = async (req, res) => {
   try {
-    let errorMessage = await validationService(req);
-    if (errorMessage) {
+    const errorMessage = await validationService(req);
+
+    if (errorMessage) 
       res.status(400).json({ status: "error", message: errorMessage });
-      return;
-    }
-    let id = req.params.id;
-    let { username, password, mobile, role, email } = req.body;
-    let data = { username, password, mobile, role, email };
+    
+    const id = req.params.id;
+    const {userName,email,mobile,password,role}=req.body
+    const user = await userControllers.updateById({ id,userName,email,mobile,password,role});
 
-    let user = await userControllers.userUpdate({ id, data, res });
-
-    res.status(200).json(user);
+   res.status(200).json({ message: "updated successfully",user, status: "success" });
   } catch (error) {
     console.log(`[${tag}] userUpdate:`, error);
-    res.status(500).json({ message: "internal server error", status: "error" });
+
+    res
+      .status(error.errorCode)
+      .json({ message: error.message, status: "error" });
   }
 };
 
-let setPassword = async (req, res) => {
+//!test services
+exports.fetchUserId = async (req, res) => {
   try {
-    let errorMessage = await validationService(req);
-    if (errorMessage) {
-      res.status(400).json({ status: "error", message: errorMessage });
-      return;
-    }
-    let { password, email } = req.body;
-    let user = await userControllers.setPassword({
-      email,
-      password,
-      res,
-    });
+    const { email } = req.body;
+    const user = await userControllers.fetchUserId({ email });
 
-    res.status(200).json(user);
+    res.status(200).json({ message: "successfull", status: "success", user });
+
   } catch (error) {
     console.log(`[${tag}] setPassword:`, error);
-    res.status(500).json({ message: "internal server error", status: "error" });
+    res
+      .status(error.errorCode)
+      .json({ message: error.message, status: "error" });
   }
 };
-
 //!service helpers
 const validationService = async (request) => {
   //server side validation
@@ -150,12 +158,3 @@ const validationService = async (request) => {
   return { [firstError.param]: firstError.msg };
 };
 
-module.exports = {
-  validateUser,
-  createUser,
-  deleteUser,
-  getAllUsers,
-  getUser,
-  setPassword,
-  userUpdate,
-};

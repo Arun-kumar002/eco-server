@@ -14,15 +14,20 @@ routes.post(`/${baseRoute}`, validationSchema.registerSchema, userService.create
 //@access private --method-POST
 //url=http://localhost:5000/user/login
 routes.post(`/${baseRoute}/login`, validationSchema.loginSchema, userService.validateUser);
-//@access private --method-PUT
-//url=http://localhost:5000/user/setpassword
-routes.put(`/${baseRoute}/setpassword`,validationSchema.loginSchema, userService.setPassword);
+
+
 //@access private --method-PUT
 //url=http://localhost:5000/user/:id
 routes.put(`/${baseRoute}/:id`, validationSchema.registerSchema,userService.userUpdate);
 //@access privat --method-delete
 //url=http://localhost:5000/user/:id
 routes.delete(`/${baseRoute}/:id`,validationSchema.paramsSchema, userService.deleteUser);
+
+//? jest testing routes
+//@access private --method-POST
+//url=http://localhost:5000/user/id
+routes.post(`/${baseRoute}/id`,userService.fetchUserId)
+
 
 //TODO exporting all routes
 module.exports = routes;
