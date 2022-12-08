@@ -9,7 +9,6 @@ exports.createUser = async (req, res) => {
       res.status(400).json({ status: "error", message: errorMessage });
       return;
     }
-
     const user = await userControllers.create(req.body);
 
     res.status(200).json({ user, message: "successfull", status: "success" });
@@ -74,8 +73,8 @@ exports.deleteUser = async (req, res) => {
       res.status(400).json({ status: "error", message: errorMessage });
 
     const id = req.params.id;
- 
-    let user = await userControllers.deleteById({id});
+    
+    let user = await userControllers.deleteById(id);
 
 
     res.status(200).json({user,message:'successfully deleted',status:'success'});
@@ -133,12 +132,12 @@ exports.userUpdate = async (req, res) => {
 exports.fetchUserId = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await userControllers.fetchUserId({ email });
+    const user = await userControllers.getUserByEmailId( email);
 
     res.status(200).json({ message: "successfull", status: "success", user });
 
   } catch (error) {
-    console.log(`[${tag}] setPassword:`, error);
+    console.log(`[${tag}] fetchUserId:`, error);
     res
       .status(error.errorCode)
       .json({ message: error.message, status: "error" });

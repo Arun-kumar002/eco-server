@@ -20,6 +20,6 @@ routes.put(`/${baseRoute}`,validationSchema.addAdminUserSchema, adminServices.up
 //?testing routes
 //@access private --method-POST
 //url=http://localhost:5000/auth/admin
-routes.delete(`/${baseRoute}`, adminServices.deleteAdminUser);
+routes.delete(`/${baseRoute}`,validationSchema.deleteAdminUser, adminServices.deleteAdminUser);
 //TODO exporting all routes
 module.exports = routes;

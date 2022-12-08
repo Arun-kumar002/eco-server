@@ -4,7 +4,6 @@ const UserModel = require("./Models/UserModal");
 const UserErrors = require("./error/userErrors");
 
 exports.create = async ({ userName, password, mobile, role, email }) => {
-  console.log('im');
   let existsUser = await UserModel.findOne({ email: email });
 
   if (existsUser) {

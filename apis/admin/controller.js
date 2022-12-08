@@ -32,18 +32,16 @@ exports.create = async ({ email, password }) => {
 exports.update = async ({ email, password }) => {
   let adminUser = await AdminModel.findOne({ email: email });
 
-  if (adminUser) {
-    let updated = adminUser.updateOne({ password: password });
-    return updated;
+  if (adminUser === null) {
+    throw new AdminErrors.AdminUpdateError();
   }
-
-  throw new AdminErrors.AdminUpdateError();
+  let updated = adminUser.updateOne({ password: password });
+  return updated;
 };
 
-
 exports.deleteAdminUserByEmail = async ({ email }) => {
-
   let adminUser = await AdminModel.findOne({ email: email });
+
   if (adminUser) {
     await AdminModel.deleteOne({ email });
     return;
@@ -51,4 +49,3 @@ exports.deleteAdminUserByEmail = async ({ email }) => {
 
   throw new AdminErrors.UserDeleteError();
 };
-

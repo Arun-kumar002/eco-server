@@ -2,7 +2,7 @@ const { validationResult } = require("express-validator");
 const authControllers = require("./controller");
 const tag = "admin-service";
 
-exports.validateAdmin = async (req, res, next) => {
+exports.validateAdmin = async (req, res) => {
   const errorMessage = await validationService(req);
   if (errorMessage) {
     return res.status(400).json({ status: "error", message: errorMessage });
@@ -23,9 +23,14 @@ exports.validateAdmin = async (req, res, next) => {
   }
 };
 
-
 exports.addAdminUser = async (req, res) => {
   try {
+    const errorMessage = await validationService(req);
+
+    if (errorMessage) {
+      return res.status(400).json({ status: "error", message: errorMessage });
+    }
+
     const admin = await authControllers.create(req.body);
 
     res
@@ -40,23 +45,38 @@ exports.addAdminUser = async (req, res) => {
   }
 };
 
-
 exports.updateAdminUser = async (req, res) => {
   try {
+    const errorMessage = await validationService(req);
+
+    if (errorMessage) {
+      return res.status(400).json({ status: "error", message: errorMessage });
+    }
+
     const admin = await authControllers.update(req.body);
     res
       .status(200)
       .json({ admin, message: "successfully updated", status: "success" });
+      
   } catch (error) {
+    console.log(`[${tag}] updateAdminUser:`, error);
+
     res
-    .status(error.errorCode)
-    .json({ message: error.message, status: "error" });
+      .status(error.errorCode)
+      .json({ message: error.message, status: "error" });
   }
 };
 
 exports.deleteAdminUser = async (req, res) => {
   try {
+    const errorMessage = await validationService(req);
+
+    if (errorMessage) {
+      return res.status(400).json({ status: "error", message: errorMessage });
+    }
+
     const { email } = req.query;
+
     await authControllers.deleteAdminUserByEmail({ email });
 
     res.status(200).json({ message: "deleted", status: "success" });
@@ -68,7 +88,6 @@ exports.deleteAdminUser = async (req, res) => {
       .json({ message: error.message, status: "error" });
   }
 };
-
 
 //!service helpers
 const validationService = async (req) => {
@@ -83,4 +102,3 @@ const validationService = async (req) => {
 
   return { [firstError.param]: firstError.msg };
 };
-

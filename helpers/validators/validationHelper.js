@@ -1,4 +1,5 @@
 const { checkSchema } = require("express-validator");
+
 const registerSchema = checkSchema({
   userName: {
     isLength: {
@@ -26,24 +27,13 @@ const registerSchema = checkSchema({
       errorMessage: "password cannot be empty",
     },
   },
-  // custom: {
-  //   options: (value, { req }) => {
-  //     let re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,}$/;
-  //     if (!re.test(value)) {
-  //       throw new Error(
-  //         "your password should have 5 char 1 up , 1 lower,1 numeric"
-  //       );
-  //     }
-  //     return true;
-  //   },
-  // },
-  // },
   email: {
     isEmail: {
       errorMessage: "enter a valid email id",
     },
   },
 });
+
 const loginSchema = checkSchema({
   email: {
     isEmail: {
@@ -64,7 +54,8 @@ const loginSchema = checkSchema({
     },
   },
 });
-const paginationSchema = checkSchema({
+
+const getAlluserSchema = checkSchema({
   limit: {
     exists: {
       errorMessage: "limit is required",
@@ -75,7 +66,13 @@ const paginationSchema = checkSchema({
       errorMessage: "pageno is required",
     },
   },
+  getCount: {
+    exists: {
+      errorMessage: "getCount is required",
+    },
+  },
 });
+
 const paramsSchema = checkSchema({
   id: {
     exists: {
@@ -83,6 +80,7 @@ const paramsSchema = checkSchema({
     },
   },
 });
+
 const addAdminUserSchema = checkSchema({
   email: {
     isEmail: {
@@ -103,6 +101,14 @@ const addAdminUserSchema = checkSchema({
     },
   },
 });
+
+const deleteAdminUser = checkSchema({
+  email: {
+    isEmail: {
+      errorMessage: "enter a valid email id",
+    },
+  },
+});
 //! parse the validation requsets
 const parseError = (error) => {
   const query = error.map((err) => {
@@ -116,7 +122,8 @@ module.exports = {
   registerSchema,
   parseError,
   loginSchema,
-  paginationSchema,
+  getAlluserSchema,
   paramsSchema,
-  addAdminUserSchema
+  addAdminUserSchema,
+  deleteAdminUser
 };

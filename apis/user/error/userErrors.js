@@ -9,7 +9,7 @@ class UserEntityNotFoundError extends Error {
   constructor() {
     super();
     this.message = "user entity not found.";
-    this.errorCode = 404;
+    this.errorCode = 400;
   }
 }
 class UserPasswordError extends Error {
