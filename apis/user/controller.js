@@ -33,16 +33,17 @@ exports.validate = async ({ email, password }) => {
 
   const token = generateToken(user._id);
 
-  return { token: token, true: true };
+  return { token: token};
 };
+
 exports.getAll = async ({ skip, limit, getCount, name, email }) => {
   let query = {};
 
-  if (name) {
+  if (name && name!='') {
     query.userName = { $regex: name, $options: "g" };
   }
 
-  if (email) {
+  if (email && email!='') {
     query.email = email;
   }
   
@@ -94,6 +95,7 @@ exports.getUserByEmailId = async (email) => {
 };
 
 exports.getById = async (id) => {
+
   const user = await UserModel.findOne({ _id: id });
 
   return user;
