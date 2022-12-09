@@ -1,10 +1,13 @@
 const { generateToken } = require("../../helpers/generaterandonHelpers");
-const UserModel = require("./Models/UserModal");
+const UserModel = require("./Models/UserModel");
 const UserErrors = require("./error/userErrors");
 
 exports.create = async ({ userName, password, mobile, role, email }) => {
   let existsUser = await UserModel.findOne({ email: email });
-
+  if (email === null) {
+    console.log("existsUser", existsUser);
+    console.log(email);
+  }
   if (existsUser) {
     throw new UserErrors.UserExistsError();
   }
@@ -33,20 +36,20 @@ exports.validate = async ({ email, password }) => {
 
   const token = generateToken(user._id);
 
-  return { token: token};
+  return { token: token };
 };
 
 exports.getAll = async ({ skip, limit, getCount, name, email }) => {
   let query = {};
 
-  if (name && name!='') {
+  if (name && name != "") {
     query.userName = { $regex: name, $options: "g" };
   }
 
-  if (email && email!='') {
+  if (email && email != "") {
     query.email = email;
   }
-  
+
   let count = undefined;
   if (getCount == true) {
     count = await UserModel.count(query);
@@ -77,11 +80,16 @@ exports.updateById = async ({
   password,
   role,
 }) => {
-  const user = await (
-    await this.getById(id)
-  ).updateOne({ userName, email, mobile, password, role }, { new: true });
+  
+  const user = await await this.getById(id);
 
-  return user;
+  const updated = await UserModel.findOneAndUpdate(
+    { email: user.email },
+    { userName, email, mobile, password, role },
+    { new: true }
+  );
+
+  return updated;
 };
 
 exports.getUserByEmailId = async (email) => {
@@ -95,7 +103,7 @@ exports.getUserByEmailId = async (email) => {
 };
 
 exports.getById = async (id) => {
-
+  
   const user = await UserModel.findOne({ _id: id });
 
   return user;
