@@ -2,7 +2,6 @@ const userControllers = require("./controller");
 const { connectDb } = require("../../config/db");
 const generateRandom = require("../../helpers/generaterandonHelpers");
 const userErrors = require("./error/userErrors");
-
 const UserErrorCodes = userErrors.UserErrorCodes;
 
 beforeAll(() => {
@@ -246,14 +245,34 @@ describe("validate", () => {
 
 describe("getAll", () => {
   const params = {
-    skip: 0,
-    limit: generateRandom.generateRandomNumber(1, 10),
-    getCount: false,
+    skip: 1,
+    limit: 5,
+    getCount: true,
     name: "(pavan)",
-    email: `${generateRandom.generateRandomString(15)}@gmail.com`,
   };
 
-  test("it should get all the users from the users collection", async () => {
+  test("it should return the count as 5 because we set limit as 5", async () => {
+    const user1 = generateRandomUser();
+    const createUser1 = await userControllers.create(user1);
+    expect(createUser1).toBeDefined();
+    const user2 = generateRandomUser();
+    const createUser2 = await userControllers.create(user2);
+    expect(createUser2).toBeDefined();
+    const user3 = generateRandomUser();
+    const createUser3 = await userControllers.create(user3);
+    expect(createUser3).toBeDefined();
+    const user4 = generateRandomUser();
+    const createUser4 = await userControllers.create(user4);
+    expect(createUser4).toBeDefined();
+    const user5 = generateRandomUser();
+    const createUser5 = await userControllers.create(user5);
+    expect(createUser5).toBeDefined();
+
+    const params = {
+      skip: 1,
+      limit: 5,
+      getCount: true,
+    };
     let result = await userControllers.getAll({
       skip: params.skip,
       limit: params.limit,
@@ -261,15 +280,96 @@ describe("getAll", () => {
     });
 
     expect(result).toBeDefined();
+    expect(result.users.length).toBe(5);
+  });
+
+  test("it should check the users are skipped", async () => {
+    const user1 = generateRandomUser();
+    const createUser1 = await userControllers.create(user1);
+    expect(createUser1).toBeDefined();
+    const user2 = generateRandomUser();
+    const createUser2 = await userControllers.create(user2);
+    expect(createUser2).toBeDefined();
+    const user3 = generateRandomUser();
+    const createUser3 = await userControllers.create(user3);
+    expect(createUser3).toBeDefined();
+    const user4 = generateRandomUser();
+    const createUser4 = await userControllers.create(user4);
+    expect(createUser4).toBeDefined();
+    const user5 = generateRandomUser();
+    const createUser5 = await userControllers.create(user5);
+    expect(createUser5).toBeDefined();
+    const user6 = generateRandomUser();
+    const createUser6 = await userControllers.create(user6);
+    expect(createUser6).toBeDefined();
+    const user7 = generateRandomUser();
+    const createUser7 = await userControllers.create(user7);
+    expect(createUser7).toBeDefined();
+    const user8 = generateRandomUser();
+    const createUser8 = await userControllers.create(user8);
+    expect(createUser8).toBeDefined();
+    const user9 = generateRandomUser();
+    const createUser9 = await userControllers.create(user9);
+    expect(createUser9).toBeDefined();
+    const user10 = generateRandomUser();
+    const createUser10 = await userControllers.create(user10);
+    expect(createUser10).toBeDefined();
+
+    let resultWithoutSkipAndLimit = await userControllers.getAll({
+      skip: 0,
+      limit: 0,
+      getCount: true,
+    });
+    expect(resultWithoutSkipAndLimit).toBeDefined();
+    expect(resultWithoutSkipAndLimit.count).toBe(
+      resultWithoutSkipAndLimit.users.length
+    );
+
+    let resultWithSkipAndLimit = await userControllers.getAll({
+      skip: 5,
+      limit: 0,
+      getCount: true,
+    });
+
+    expect(resultWithSkipAndLimit).toBeDefined();
+    expect(resultWithSkipAndLimit.users.length).toBe(
+      resultWithoutSkipAndLimit.users.length - 5
+    );
+  });
+
+  test("it should get all the users from the users collection", async () => {
+    let result = await userControllers.getAll({
+      skip: 0,
+      limit: 0,
+      getCount: params.getCount,
+    });
+    expect(result).toBeDefined();
     expect(result.users).toBeDefined();
-    expect(result.users[0].id).toBeDefined();
-    expect(result.users[0].updatedAt).toBeDefined();
-    expect(result.users[0].createdAt).toBeDefined();
-    expect(result.users[0].userName).toBeDefined();
-    expect(result.users[0].email).toBeDefined();
-    expect(result.users[0].role).toBeDefined();
-    expect(result.users[0].mobile).toBeDefined();
-    expect(result.users[0].promptPasswordChange).toBeDefined();
+  
+    // expect(result.users).toEqual(
+    //   expect.arrayContaining([
+    //     expect.objectContaining({
+    //       '_id':toBeDefined(),
+    //       "_v":toBeDefined(),
+    //       "createdAt": toBeDefined(),
+    //       "updatedAt": toBeDefined(),
+    //       "email": toBeDefined(),
+    //       "userName": toBeDefined(),
+    //       "role": toBeDefined(),
+    //       "promptPasswordChange": toBeDefined(),
+    //       "mobile": toBeDefined(),
+    //     }),
+    //   ])
+    // );
+
+    // expect(id).toBeDefined();
+    // expect(updatedAt).toBeDefined();
+    // expect(createdAt).toBeDefined();
+    // expect(userName).toBeDefined();
+    // expect(email).toBeDefined();
+    // expect(role).toBeDefined();
+    // expect(mobile).toBeDefined();
+    // expect(promptPasswordChange).toBeDefined();
   });
 
   test("it should return a empty [] for users not found", async () => {
@@ -287,22 +387,13 @@ describe("getAll", () => {
 
   test("it should return a count if we give getCount equal to true", async () => {
     let result = await userControllers.getAll({
-      skip: params.skip,
-      limit: params.limit,
+      skip: 0,
+      limit: 0,
       getCount: true,
     });
 
     expect(result).toBeDefined();
-    expect(result.count).toBeDefined();
-    expect(result.users).toBeDefined();
-    expect(result.users[0].id).toBeDefined();
-    expect(result.users[0].updatedAt).toBeDefined();
-    expect(result.users[0].createdAt).toBeDefined();
-    expect(result.users[0].userName).toBeDefined();
-    expect(result.users[0].email).toBeDefined();
-    expect(result.users[0].role).toBeDefined();
-    expect(result.users[0].mobile).toBeDefined();
-    expect(result.users[0].promptPasswordChange).toBeDefined();
+    expect(result.count).toBe(result.users.length);
   });
 
   test("it should return a count is undefined if we give getCount equal to false", async () => {

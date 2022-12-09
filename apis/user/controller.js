@@ -4,10 +4,7 @@ const UserErrors = require("./error/userErrors");
 
 exports.create = async ({ userName, password, mobile, role, email }) => {
   let existsUser = await UserModel.findOne({ email: email });
-  if (email === null) {
-    console.log("existsUser", existsUser);
-    console.log(email);
-  }
+
   if (existsUser) {
     throw new UserErrors.UserExistsError();
   }
@@ -55,8 +52,10 @@ exports.getAll = async ({ skip, limit, getCount, name, email }) => {
     count = await UserModel.count(query);
   }
 
+  const skipCount= limit ==0?skip:skip*limit
+  
   const users = await UserModel.find(query)
-    .skip(skip * limit)
+    .skip(skipCount)
     .limit(limit);
 
   return { users: users || [], count: count };
@@ -103,7 +102,7 @@ exports.getUserByEmailId = async (email) => {
 };
 
 exports.getById = async (id) => {
-  
+
   const user = await UserModel.findOne({ _id: id });
 
   return user;
