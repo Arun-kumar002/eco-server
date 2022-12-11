@@ -244,13 +244,6 @@ describe("validate", () => {
 });
 
 describe("getAll", () => {
-  const params = {
-    skip: 1,
-    limit: 5,
-    getCount: true,
-    name: "(pavan)",
-  };
-
   test("it should return the count as 5 because we set limit as 5", async () => {
     const user1 = generateRandomUser();
     const createUser1 = await userControllers.create(user1);
@@ -341,48 +334,36 @@ describe("getAll", () => {
     let result = await userControllers.getAll({
       skip: 0,
       limit: 0,
-      getCount: params.getCount,
+      getCount: true,
     });
     expect(result).toBeDefined();
     expect(result.users).toBeDefined();
-  
-    // expect(result.users).toEqual(
-    //   expect.arrayContaining([
-    //     expect.objectContaining({
-    //       '_id':toBeDefined(),
-    //       "_v":toBeDefined(),
-    //       "createdAt": toBeDefined(),
-    //       "updatedAt": toBeDefined(),
-    //       "email": toBeDefined(),
-    //       "userName": toBeDefined(),
-    //       "role": toBeDefined(),
-    //       "promptPasswordChange": toBeDefined(),
-    //       "mobile": toBeDefined(),
-    //     }),
-    //   ])
-    // );
+    expect(result.count).toBeDefined();
 
-    // expect(id).toBeDefined();
-    // expect(updatedAt).toBeDefined();
-    // expect(createdAt).toBeDefined();
-    // expect(userName).toBeDefined();
-    // expect(email).toBeDefined();
-    // expect(role).toBeDefined();
-    // expect(mobile).toBeDefined();
-    // expect(promptPasswordChange).toBeDefined();
+    for (let user of result.users) {
+      expect(user.id).toBeDefined();
+      expect(user.updatedAt).toBeDefined();
+      expect(user.createdAt).toBeDefined();
+      expect(user.userName).toBeDefined();
+      expect(user.email).toBeDefined();
+      expect(user.role).toBeDefined();
+      expect(user.mobile).toBeDefined();
+      expect(user.promptPasswordChange).toBeDefined();
+    }
   });
 
   test("it should return a empty [] for users not found", async () => {
-    let users = await userControllers.getAll({
-      skip: params.skip,
-      limit: params.limit,
-      getCount: params.getCount,
-      email: params.email,
-    });
+    const params = {
+      skip: 1,
+      limit: 5,
+      getCount: false,
+      name: "(pavan)",
+    };
+    let result = await userControllers.getAll(params);
 
-    await expect(users).toBeDefined();
+    await expect(result).toBeDefined();
 
-    expect(typeof users.users).toBe("object");
+    expect(result.users).toEqual(expect.arrayContaining([]));
   });
 
   test("it should return a count if we give getCount equal to true", async () => {
@@ -397,14 +378,80 @@ describe("getAll", () => {
   });
 
   test("it should return a count is undefined if we give getCount equal to false", async () => {
-    let users = await userControllers.getAll({
-      skip: params.skip,
-      limit: params.limit,
+    const user1 = generateRandomUser();
+    const createUser1 = await userControllers.create(user1);
+    expect(createUser1).toBeDefined();
+    const user2 = generateRandomUser();
+    const createUser2 = await userControllers.create(user2);
+    expect(createUser2).toBeDefined();
+    const user3 = generateRandomUser();
+    const createUser3 = await userControllers.create(user3);
+    expect(createUser3).toBeDefined();
+    const user4 = generateRandomUser();
+    const createUser4 = await userControllers.create(user4);
+    expect(createUser4).toBeDefined();
+    const user5 = generateRandomUser();
+    const createUser5 = await userControllers.create(user5);
+    expect(createUser5).toBeDefined();
+
+    let result = await userControllers.getAll({
+      skip: 0,
+      limit: 5,
       getCount: false,
     });
-    await expect(users).toBeDefined();
+    expect(result).toBeDefined();
+    expect(result.count).toBe(undefined);
+    expect(result.users).toBeDefined();
 
-    expect(users.count).toBe(undefined);
+    for (let user of result.users) {
+      expect(user.id).toBeDefined();
+      expect(user.updatedAt).toBeDefined();
+      expect(user.createdAt).toBeDefined();
+      expect(user.userName).toBeDefined();
+      expect(user.email).toBeDefined();
+      expect(user.role).toBeDefined();
+      expect(user.mobile).toBeDefined();
+      expect(user.promptPasswordChange).toBeDefined();
+    }
+  });
+
+  test("it should return a correct count of user for the username", async () => {
+    const user1 = isUserNameCountValidation();
+    const createUser1 = await userControllers.create(user1);
+    expect(createUser1).toBeDefined();
+    const user2 = isUserNameCountValidation();
+    const createUser2 = await userControllers.create(user2);
+    expect(createUser2).toBeDefined();
+    const user3 = isUserNameCountValidation();
+    const createUser3 = await userControllers.create(user3);
+    expect(createUser3).toBeDefined();
+    const user4 = isUserNameCountValidation();
+    const createUser4 = await userControllers.create(user4);
+    expect(createUser4).toBeDefined();
+    const user5 = isUserNameCountValidation();
+    const createUser5 = await userControllers.create(user5);
+    expect(createUser5).toBeDefined();
+
+    let result = await userControllers.getAll({
+      skip: 0,
+      limit: 0,
+      getCount: false,
+      name: "(arun)",
+    });
+    expect(result).toBeDefined();
+    expect(result.count).toBe(undefined);
+    expect(result.users).toBeDefined();
+    expect(result.users.length).toBe(5);
+    for (let user of result.users) {
+      expect(user.id).toBeDefined();
+      expect(user.updatedAt).toBeDefined();
+      expect(user.createdAt).toBeDefined();
+      expect(user.userName).toBeDefined();
+      expect(user.email).toBeDefined();
+      expect(user.role).toBeDefined();
+      expect(user.mobile).toBeDefined();
+      expect(user.promptPasswordChange).toBeDefined();
+    }
   });
 });
 
@@ -488,4 +535,13 @@ const generateRandomUser = () => {
     email: `${generateRandom.generateRandomString(10)}@gmail.com`,
   };
   return inputs;
+};
+const isUserNameCountValidation = () => {
+  return {
+    userName: "(arun)",
+    email: `${generateRandom.generateRandomString(10)}@gmail.com`,
+    password: generateRandom.generateRandomString(7),
+    mobile: 8236438,
+    role: "user",
+  };
 };
