@@ -27,11 +27,10 @@ AdminSchmema.pre("save", async function () {
 });
 
 AdminSchmema.methods.matchPassword = async function (enteredPassword) {
-  
+
   let password=await CryptoJS.AES.decrypt(this.password, PASSWORD_SECRET).toString(
     CryptoJS.enc.Utf8
   );
-
   return enteredPassword==password
 };
 

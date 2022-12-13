@@ -2,7 +2,10 @@ const userControllers = require("./controller");
 const { connectDb } = require("../../config/db");
 const generateRandom = require("../../helpers/generaterandonHelpers");
 const userErrors = require("./error/userErrors");
-const {hashingPassword,unHashingPassword} = require("../../helpers/cryptoHelper");
+const {
+  hashingPassword,
+  unHashingPassword,
+} = require("../../helpers/cryptoHelper");
 
 beforeAll(() => {
   connectDb();
@@ -25,7 +28,9 @@ describe("create", () => {
     expect(user.userName).toBe(createUser.userName);
     expect(user.email).toBe(createUser.email);
     expect(user.mobile).toBe(createUser.mobile);
-    expect(user.password).toBe(createUser.password);
+    expect(unHashingPassword(user.password)).toBe(
+      unHashingPassword(createUser.password)
+    );
     expect(user.role).toBe(createUser.role);
     expect(user.promptPasswordChange).toBe(true);
   });
@@ -33,7 +38,7 @@ describe("create", () => {
   test("it should return error message for the same email id", async () => {
     const createUser = generateRandomUser();
     expect(userControllers.create).toBeInstanceOf(Function);
-    await userControllers.create(createUser);
+    await userControllers.create(createUser); //populatin db with some user
 
     expect(() => userControllers.create(createUser)).rejects.toThrow(
       userErrors.UserExistsError
@@ -62,7 +67,9 @@ describe("create", () => {
     expect(resultUser.email).toBe(user.email);
     expect(resultUser.role).toBeDefined();
     expect(resultUser.mobile).toBe(user.mobile);
-    expect(resultUser.password).toBe(user.password);
+    expect(unHashingPassword(resultUser.password)).toBe(
+      unHashingPassword(user.password)
+    );
     expect(resultUser.promptPasswordChange).toBe(true);
   });
 
@@ -72,6 +79,7 @@ describe("create", () => {
       mobile: generateRandom.generateRandomNumber(55555, 1000000),
       role: "user",
       email: `${generateRandom.generateRandomString(10)}@gmail.com`,
+      password: generateRandom.generateRandomString(10),
     };
     expect(userControllers.create).toBeInstanceOf(Function);
     const resultUser = await userControllers.create(user);
@@ -88,7 +96,9 @@ describe("create", () => {
     expect(resultUser.email).toBe(user.email);
     expect(resultUser.role).toBe(user.role);
     expect(resultUser.mobile).toBe(user.mobile);
-    expect(resultUser.password).toBe(user.password);
+    expect(unHashingPassword(resultUser.password)).toBe(
+      unHashingPassword(user.password)
+    );
     expect(resultUser.promptPasswordChange).toBe(true);
   });
 
@@ -118,7 +128,7 @@ describe("update", () => {
   test("it should return user not found for invalid user", async () => {
     const createUser = generateRandomUser();
     expect(userControllers.create).toBeInstanceOf(Function);
-    const user = await userControllers.create(createUser);
+    const user = await userControllers.create(createUser); //populatin db with some user
     expect(user).toBeDefined();
 
     const email = `${generateRandom.generateRandomString(20)}@yahoo.com`;
@@ -135,7 +145,7 @@ describe("update", () => {
   test("it should update the existing user with correct id ", async () => {
     const createUser = generateRandomUser();
     expect(userControllers.create).toBeInstanceOf(Function);
-    const user = await userControllers.create(createUser);
+    const user = await userControllers.create(createUser); //populatin db with some user
 
     expect(user).toBeDefined();
     expect(user.id).toBeDefined();
@@ -175,7 +185,7 @@ describe("delete", () => {
   test("it should delete a existing user", async () => {
     const createUser = generateRandomUser();
     expect(userControllers.create).toBeInstanceOf(Function);
-    const user = await userControllers.create(createUser);
+    const user = await userControllers.create(createUser); //populatin db with some user
     expect(user).toBeDefined();
     expect(user.id).toBeDefined();
     expect(typeof user.id).toBe("string");
@@ -203,7 +213,7 @@ describe("delete", () => {
   test("it should return not found for invalid user", async () => {
     const createUser = generateRandomUser();
     expect(userControllers.create).toBeInstanceOf(Function);
-    const user = await userControllers.create(createUser);
+    const user = await userControllers.create(createUser); //populatin db with some user
     expect(user).toBeDefined();
     expect(user.id).toBeDefined();
     expect(typeof user.id).toBe("string");
@@ -219,7 +229,7 @@ describe("delete", () => {
 describe("validate", () => {
   test("it should return successs if the email&password are correct", async () => {
     const createUser = generateRandomUser();
-    const user = await userControllers.create(createUser);
+    const user = await userControllers.create(createUser); //populatin db with some user
     expect(user).toBeDefined();
     expect(user.id).toBeDefined();
     expect(typeof user.id).toBe("string");
@@ -243,16 +253,16 @@ describe("validate", () => {
     expect(result.user.createdAt).toBeDefined();
     expect(result.user.createdAt).toBeInstanceOf(Date);
     expect(result.user.createdAt <= result.user.updatedAt).toBe(true);
-    expect(result.user.userName).toBe(createUser.userName);
-    expect(result.user.email).toBe(createUser.email);
-    expect(result.user.role).toBe(createUser.role);
-    expect(result.user.mobile).toBe(createUser.mobile);
+    expect(result.user.userName).toBe(user.userName);
+    expect(result.user.email).toBe(user.email);
+    expect(result.user.role).toBe(user.role);
+    expect(result.user.mobile).toBe(user.mobile);
     expect(result.user.promptPasswordChange).toBe(true);
   });
 
   test("it should return password missmatch error for entering wrong password", async () => {
     const createUser = generateRandomUser();
-    const user = await userControllers.create(createUser);
+    const user = await userControllers.create(createUser); //populatin db with some user
 
     expect(user).toBeDefined();
     expect(user.email).toBeDefined();
@@ -315,6 +325,7 @@ describe("validate", () => {
 describe("getAll", () => {
   test("it should return the count as 5 because we set limit as 5", async () => {
     const limit = 5;
+    expect(userControllers.create).toBeInstanceOf(Function);
     for (let i = 0; i < 10; i++) {
       const createUser = generateRandomUser(i); //populating db with some users
       let user = await userControllers.create(createUser);
@@ -351,11 +362,13 @@ describe("getAll", () => {
   });
 
   test("it should get all the users from the users collection", async () => {
+    expect(userControllers.create).toBeInstanceOf(Function);
     for (let i = 0; i < 10; i++) {
       const createUser = generateRandomUser(i); //populating db with some users
       let user = await userControllers.create(createUser);
       expect(user).toBeDefined();
     }
+    expect(userControllers.getAll).toBeInstanceOf(Function);
 
     let result = await userControllers.getAll({
       skip: 0,
@@ -383,12 +396,13 @@ describe("getAll", () => {
   });
 
   test("it should return a empty [] for users not found", async () => {
-    let userNames=[]
+    let userNames = [];
+    expect(userControllers.create).toBeInstanceOf(Function);
     for (let i = 0; i < 10; i++) {
       const createUser = generateRandomUser(i); //populating db with some users
       let user = await userControllers.create(createUser);
       expect(user).toBeDefined();
-      userNames.push(user.userName)
+      userNames.push(user.userName);
     }
 
     const params = {
@@ -397,8 +411,8 @@ describe("getAll", () => {
       getCount: false,
       name: "(pavan)",
     };
-    expect(!userNames.includes(params.name)).toBe(true)
-
+    expect(!userNames.includes(params.name)).toBe(true);
+    expect(userControllers.getAll).toBeInstanceOf(Function);
     let result = await userControllers.getAll(params);
 
     expect(result).toBeDefined();
@@ -406,12 +420,14 @@ describe("getAll", () => {
   });
 
   test("it should return a count if we give getCount equal to true", async () => {
+    expect(userControllers.create).toBeInstanceOf(Function);
 
     for (let i = 0; i < 10; i++) {
       const createUser = generateRandomUser(i); //populating db with some users
       let user = await userControllers.create(createUser);
       expect(user).toBeDefined();
     }
+    expect(userControllers.getAll).toBeInstanceOf(Function);
 
     let result = await userControllers.getAll({
       skip: 0,
@@ -438,12 +454,14 @@ describe("getAll", () => {
   });
 
   test("it should return a count is undefined for {getCount: false}", async () => {
+    expect(userControllers.create).toBeInstanceOf(Function);
 
     for (let i = 0; i < 10; i++) {
-      const createUser = generateRandomUser();  //populating db with some users
+      const createUser = generateRandomUser(); //populating db with some users
       let user = await userControllers.create(createUser);
       expect(user).toBeDefined();
     }
+    expect(userControllers.getAll).toBeInstanceOf(Function);
 
     let result = await userControllers.getAll({
       skip: 0,
@@ -472,12 +490,14 @@ describe("getAll", () => {
   });
 
   test("it should return a correct count of user for the username", async () => {
+    expect(userControllers.create).toBeInstanceOf(Function);
 
     for (let i = 0; i < 10; i++) {
       const createUser = UserNameCountValidation(i);
       let user = await userControllers.create(createUser); //populating db with users
       expect(user).toBeDefined();
     }
+    expect(userControllers.getAll).toBeInstanceOf(Function);
 
     let result = await userControllers.getAll({
       skip: 0,
@@ -510,6 +530,7 @@ describe("getAll", () => {
 
 describe("getUserByEmailId", () => {
   test("it should throw a error for wrong email id", async () => {
+    expect(userControllers.create).toBeInstanceOf(Function);
 
     const createUser = generateRandomUser(); //populating db with user
     const user = await userControllers.create(createUser);
@@ -519,22 +540,26 @@ describe("getUserByEmailId", () => {
 
     let email = `${generateRandom.generateRandomString(15)}@gmail.com`;
     expect(email != user.email).toBe(true);
+    expect(userControllers.getUserByEmailId).toBeInstanceOf(Function);
 
     expect(() => userControllers.getUserByEmailId(email)).rejects.toThrow(
       userErrors.UserNotFoundError
     );
-
   });
 
   test("it should return a user for correct email", async () => {
 
-    const createUser = generateRandomUser();  //populating db with user
+    expect(userControllers.create).toBeInstanceOf(Function);
+
+    const createUser = generateRandomUser(); //populating db with user
     const user = await userControllers.create(createUser);
     expect(user).toBeDefined();
-    expect(user.id).toBeDefined()
-    expect(typeof user.id).toBe('string')
-    expect(user.email).toBeDefined()
-    expect(user.email == createUser.email).toBe(true)
+    expect(user.id).toBeDefined();
+    expect(typeof user.id).toBe("string");
+    expect(user.email).toBeDefined();
+    expect(user.email == createUser.email).toBe(true);
+
+    expect(userControllers.getUserByEmailId).toBeInstanceOf(Function);
 
     let getUser = await userControllers.getUserByEmailId(user.email);
 
@@ -554,13 +579,16 @@ describe("getUserByEmailId", () => {
 
   test("it should return error because email is mandatory field", async () => {
 
-    const createUser = generateRandomUser();  //populating db with some users
+    expect(userControllers.create).toBeInstanceOf(Function);
+
+    const createUser = generateRandomUser(); //populating db with some users
     const user = await userControllers.create(createUser);
     expect(user).toBeDefined();
-    expect(user.id).toBeDefined()
-    expect(typeof user.id).toBe('string')
-    expect(user.email).toBeDefined()
-    expect(user.email == createUser.email).toBe(true)
+    expect(user.id).toBeDefined();
+    expect(typeof user.id).toBe("string");
+    expect(user.email).toBeDefined();
+    expect(user.email == createUser.email).toBe(true);
+    expect(userControllers.getUserByEmailId).toBeInstanceOf(Function);
 
     expect(() => userControllers.getUserByEmailId(null)).rejects.toThrow(
       userErrors.MandatoryFieldsError
@@ -571,12 +599,15 @@ describe("getUserByEmailId", () => {
 
 describe("getById", () => {
   test("it should return a user by id", async () => {
+    expect(userControllers.create).toBeInstanceOf(Function);
+
     const createUser = generateRandomUser();
-    const user = await userControllers.create(createUser);
+    const user = await userControllers.create(createUser); //populatin db with some user
     expect(user).toBeDefined();
     expect(user.id).toBeDefined();
     expect(typeof user.id).toBe("string");
 
+    expect(userControllers.getById).toBeInstanceOf(Function);
     let getUser = await userControllers.getById(user.id);
 
     expect(getUser.id).toBeDefined();
@@ -594,6 +625,15 @@ describe("getById", () => {
   });
 
   test("it should return a error for invalid id ", async () => {
+
+    expect(userControllers.create).toBeInstanceOf(Function);
+    const createUser = generateRandomUser();
+    const user = await userControllers.create(createUser); //populatin db with some user
+    expect(user).toBeDefined();
+    expect(user.id).toBeDefined();
+    expect(typeof user.id).toBe("string");
+
+    expect(userControllers.getById).toBeInstanceOf(Function);
     expect(() => userControllers.getById(null)).rejects.toThrow(
       userErrors.MandatoryFieldsError
     );
@@ -602,7 +642,7 @@ describe("getById", () => {
 
 const generateRandomUser = (i) => {
   const inputs = {
-    userName: i ? "testing-jest"+i:"testing-jest",
+    userName: i ? "testing-jest" + i : "testing-jest",
     password: hashingPassword("test123"),
     mobile: generateRandom.generateRandomNumber(55555, 1000000),
     role: "user",
