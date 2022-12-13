@@ -20,8 +20,8 @@ app.use(
 );
 app.use(morgan("dev"));
 //!mount here
-app.use("/", userRoutes);
-app.use("/auth", adminRoutes);
+app.use("/api/v1", userRoutes);
+app.use("/api/v1", adminRoutes);
 app.use("/", notFoundRoutes);
 //!server section
 connectDb()

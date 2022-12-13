@@ -6,5 +6,6 @@ module.exports = {
   JWT_SECRET: process.env.JWT_SECRET,
   PASSPORT_SECRET: process.env.PASSPORT_SECRET,
   ENV:process.env.ENV,
-  HOST:process.env.HOST
+  HOST:process.env.HOST,
+  PASSWORD_SECRET:process.env.PASSWORD_SECRET
 };

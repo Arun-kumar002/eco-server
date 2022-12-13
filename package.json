@@ -7,7 +7,7 @@
     "test": "jest __test__",
     "start": "nodemon server.js",
     "watch": "jest --watchAll",
-    "utest": "jest apis/user"
+    "utest": "jest apis/user "
   },
   "keywords": [],
   "author": "",
@@ -31,8 +31,10 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.8.0",
     "pdf-to-png": "^1.0.3",
+    "python": "0.0.4",
     "supertest": "^6.3.1",
     "ts-jest": "^29.0.3",
+    "validator": "^13.7.0",
     "wkhtmltopdf": "^0.4.0"
   },
   "devDependencies": {

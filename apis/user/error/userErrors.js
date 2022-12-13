@@ -6,6 +6,8 @@ const UserErrorCode = {
   ENTITY_DELETE_FAILED: 304,
   ENTITY_ID_INVALID: 204,
   MANDATORY_FIELDS_ERROR: 401,
+  VALIDATION_ERROR: 400,
+  NOT_FOUNT: 404,
 };
 
 class UserError extends Error {
@@ -15,6 +17,13 @@ class UserError extends Error {
     this.message = message;
   }
 }
+class MandatoryFieldsError extends Error {
+  constructor() {
+    super();
+    this.message = "mandatory fields missing.";
+    this.errorCode = UserErrorCode.MANDATORY_FIELDS_ERROR;
+  }
+}
 class UserEntityNotFoundError extends Error {
   constructor() {
     super();
@@ -22,7 +31,7 @@ class UserEntityNotFoundError extends Error {
     this.errorCode = UserErrorCode.ENTITY_NOT_FOUND;
   }
 }
-class UserPasswordError extends Error {
+class CredentialsMissmatchError extends Error {
   constructor() {
     super();
     this.message = "password mismatch";
@@ -65,16 +74,25 @@ class UserIdInvalid extends Error {
   }
 }
 
+class ValidationError extends Error {
+  constructor() {
+    super();
+    this.message = "invalid values";
+    this.errorCode = UserErrorCode.VALIDATION_ERROR;
+  }
+}
 const UserErrorCodes = UserErrorCode;
 
 module.exports = {
   UserError,
   UserEntityNotFoundError,
   UserExistsError,
-  UserPasswordError,
+  CredentialsMissmatchError,
   UserNotFoundError,
   UserDeleteError,
   UserUpdateError,
   UserIdInvalid,
   UserErrorCodes,
+  MandatoryFieldsError,
+  ValidationError,
 };

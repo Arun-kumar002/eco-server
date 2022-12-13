@@ -1,14 +1,14 @@
 const { Schema, model } = require("mongoose");
-
+const {}=require('validator')
 const UserSchema = new Schema(
   {
     userName: {
       type: String,
-      require: true,
+      required: true,
     },
     email: {
       type: String,
-      require: true,
+      required: true,
     },
     mobile: {
       type: Number,
@@ -28,6 +28,6 @@ const UserSchema = new Schema(
       default: "user",
     },
   },
-  { timestamps: true,collection:'users'}  // collation: "User" 
+  { timestamps: true, collection: "users" } // collation: "User"
 );
 module.exports = model("User", UserSchema);

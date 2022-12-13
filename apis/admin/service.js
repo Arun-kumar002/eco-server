@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const authControllers = require("./controller");
+const { hashingPassword } = require("../../helpers/cryptoHelper");
 const tag = "admin-service";
 
 exports.validateAdmin = async (req, res) => {
@@ -53,11 +54,13 @@ exports.updateAdminUser = async (req, res) => {
       return res.status(400).json({ status: "error", message: errorMessage });
     }
 
-    const admin = await authControllers.update(req.body);
+    let {email,password}=req.body
+    password=hashingPassword(password)
+    
+    const admin = await authControllers.update({email,password});
     res
       .status(200)
       .json({ admin, message: "successfully updated", status: "success" });
-      
   } catch (error) {
     console.log(`[${tag}] updateAdminUser:`, error);
 

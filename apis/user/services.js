@@ -1,7 +1,7 @@
 const { validationResult } = require("express-validator");
 const userControllers = require("./controller");
 const tag = "user-service";
-
+const { hashingPassword } = require("../../helpers/cryptoHelper");
 exports.createUser = async (req, res) => {
   try {
     const errorMessage = await validationService(req);
@@ -9,9 +9,21 @@ exports.createUser = async (req, res) => {
       res.status(400).json({ status: "error", message: errorMessage });
       return;
     }
-    const user = await userControllers.create(req.body);
+    let { userName, password, mobile, role, email } = req.body;
 
-    res.status(200).json({ user:user.userName, message: "successfull", status: "success" });
+    password = hashingPassword(password);
+
+    const user = await userControllers.create({
+      userName,
+      password,
+      mobile,
+      role,
+      email,
+    });
+
+    res
+      .status(200)
+      .json({ user: user.userName, message: "successfull", status: "success" });
   } catch (error) {
     console.log(`[${tag}] createUser:`, error);
 
@@ -51,12 +63,17 @@ exports.getAllUsers = async (req, res) => {
 
     let { skip, limit, getCount, name, email } = req.query;
 
-    const users = await userControllers.getAll({ skip, limit, getCount:JSON.parse(getCount), name, email });
+    const users = await userControllers.getAll({
+      skip,
+      limit,
+      getCount: JSON.parse(getCount),
+      name,
+      email,
+    });
 
     res
       .status(200)
       .json({ users, message: "successfully fetched", status: "success" });
-
   } catch (error) {
     console.log(`[${tag}] getAllUsers:`, error);
     res
@@ -73,16 +90,18 @@ exports.deleteUser = async (req, res) => {
       res.status(400).json({ status: "error", message: errorMessage });
 
     const id = req.params.id;
-    
+
     let user = await userControllers.deleteById(id);
 
-
-    res.status(200).json({user,message:'successfully deleted',status:'success'});
-
+    res
+      .status(200)
+      .json({ user, message: "successfully deleted", status: "success" });
   } catch (error) {
     console.log(`[${tag}] deleteUser:`, error);
 
-    res.status(error.errorCode).json({ message: error.message, status: "error" });
+    res
+      .status(error.errorCode)
+      .json({ message: error.message, status: "error" });
   }
 };
 
@@ -96,14 +115,17 @@ exports.getUser = async (req, res) => {
     }
 
     const id = req.params.id;
-    const user = await userControllers.getById( id );
+    const user = await userControllers.getById(id);
 
-    res.status(200).json({user,message:'successfully fetched',status:'success'});
-
+    res
+      .status(200)
+      .json({ user, message: "successfully fetched", status: "success" });
   } catch (error) {
     console.log(`[${tag}] getUser:`, error);
 
-    res.status(error.errorCode).json({ message: error.message, status: "error" });
+    res
+      .status(error.errorCode)
+      .json({ message: error.message, status: "error" });
   }
 };
 
@@ -111,14 +133,25 @@ exports.userUpdate = async (req, res) => {
   try {
     const errorMessage = await validationService(req);
 
-    if (errorMessage) 
+    if (errorMessage)
       res.status(400).json({ status: "error", message: errorMessage });
-    
-    const id = req.params.id;
-    const {userName,email,mobile,password,role}=req.body
-    const user = await userControllers.updateById({ id,userName,email,mobile,password,role});
 
-   res.status(200).json({ message: "updated successfully",user, status: "success" });
+    const id = req.params.id;
+    let { userName, email, mobile, password, role } = req.body;
+    password=hashingPassword(password)
+
+    const user = await userControllers.updateById({
+      id,
+      userName,
+      email,
+      mobile,
+      password,
+      role,
+    });
+
+    res
+      .status(200)
+      .json({ message: "updated successfully", user, status: "success" });
   } catch (error) {
     console.log(`[${tag}] userUpdate:`, error);
 
@@ -132,10 +165,11 @@ exports.userUpdate = async (req, res) => {
 exports.fetchUserId = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await userControllers.getUserByEmailId( email);
+    const user = await userControllers.getUserByEmailId(email);
 
-    res.status(200).json({ message: "successfull", status: "success", user:user._id });
-
+    res
+      .status(200)
+      .json({ message: "successfull", status: "success", user: user._id });
   } catch (error) {
     console.log(`[${tag}] fetchUserId:`, error);
     res
@@ -156,4 +190,3 @@ const validationService = async (request) => {
 
   return { [firstError.param]: firstError.msg };
 };
-

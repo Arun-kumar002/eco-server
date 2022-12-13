@@ -10,8 +10,9 @@ exports.validate = async ({ email, password }) => {
   if (!user) {
     throw new AdminErrors.AdminEntityNotFoundError();
   }
+  let validate=await user.matchPassword(password)
 
-  if (user.password !== password) {
+  if (validate==false) {
     throw new AdminErrors.AdminPasswordError();
   }
 
@@ -30,12 +31,14 @@ exports.create = async ({ email, password }) => {
 };
 
 exports.update = async ({ email, password }) => {
+
   let adminUser = await AdminModel.findOne({ email: email });
 
   if (adminUser === null) {
     throw new AdminErrors.AdminUpdateError();
   }
-  let updated = adminUser.updateOne({ password: password });
+
+  let updated = adminUser.updateOne({ password:password }, { new: true });
   return updated;
 };
 

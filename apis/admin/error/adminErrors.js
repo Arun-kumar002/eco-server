@@ -1,10 +1,12 @@
-const AdminErrorCodes = {
+const AdminErrorCode = {
   ENTITY_NOT_FOUND: 404,
-  PASSWORD_MISSMATCH:403,
-  ENTITY_ALREADY_EXISTS:403,
-  ENTITY_UPDATE_FAILED:304,
-  ENTITY_DELETE_FAILED:304,
-  ENTITY_ID_INVALID:204
+  CREDENTIALS_MISSMATCH: 403,
+  ENTITY_ALREADY_EXISTS: 403,
+  ENTITY_UPDATE_FAILED: 304,
+  ENTITY_DELETE_FAILED: 304,
+  ENTITY_ID_INVALID: 204,
+  VALIDATION_ERROR: 400,
+  NOT_FOUND: 404,
 };
 
 class AdminError extends Error {
@@ -26,7 +28,7 @@ class AdminPasswordError extends Error {
   constructor() {
     super();
     this.message = "password mismatch";
-    this.errorCode = AdminErrorCodes.PASSWORD_MISSMATCH;
+    this.errorCode = AdminErrorCodes.CREDENTIALS_MISSMATCH;
   }
 }
 class AdminExists extends Error {
@@ -50,6 +52,7 @@ class UserDeleteError extends Error {
     this.errorCode = AdminErrorCodes.ENTITY_DELETE_FAILED;
   }
 }
+const AdminErrorCodes = AdminErrorCode;
 module.exports = {
   AdminError,
   AdminEntityNotFoundError,
@@ -57,4 +60,5 @@ module.exports = {
   AdminExists,
   AdminUpdateError,
   UserDeleteError,
+  AdminErrorCodes,
 };
