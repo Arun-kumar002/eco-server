@@ -1,4 +1,5 @@
 const { checkSchema } = require("express-validator");
+const mongoose = require("mongoose");
 
 const registerSchema = checkSchema({
   userName: {
@@ -78,6 +79,15 @@ const paramsSchema = checkSchema({
     exists: {
       errorMessage: "params id  is required",
     },
+    custom: {
+      options: (value, { req }) => {
+        let isValid = mongoose.Types.ObjectId.isValid(value);
+        if (!isValid) {
+          throw new Error("user id invalid");
+        }
+        return true;
+      },
+    },
   },
 });
 
@@ -125,5 +135,5 @@ module.exports = {
   getAlluserSchema,
   paramsSchema,
   addAdminUserSchema,
-  deleteAdminUser
+  deleteAdminUser,
 };

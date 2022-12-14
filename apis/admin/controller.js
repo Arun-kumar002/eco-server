@@ -3,7 +3,7 @@ const AdminModel = require("./Models/AdminModel");
 const { generateToken } = require("../../helpers/generaterandonHelpers");
 const AdminErrors = require("./error/adminErrors");
 
-//!local ends
+
 
 exports.validate = async ({ email, password }) => {
   const user = await AdminModel.findOne({ email }).select("+password");
@@ -18,7 +18,7 @@ exports.validate = async ({ email, password }) => {
 
   const token = generateToken(user._id);
 
-  return { token };
+  return { token:token,admin:user };
 };
 
 exports.create = async ({ email, password }) => {

@@ -2,13 +2,17 @@ const { validationResult } = require("express-validator");
 const userControllers = require("./controller");
 const tag = "user-service";
 const { hashingPassword } = require("../../helpers/cryptoHelper");
+const userErrors = require("./error/userErrors");
+
 exports.createUser = async (req, res) => {
   try {
     const errorMessage = await validationService(req);
+
     if (errorMessage) {
       res.status(400).json({ status: "error", message: errorMessage });
       return;
     }
+
     let { userName, password, mobile, role, email } = req.body;
 
     password = hashingPassword(password);
@@ -20,10 +24,10 @@ exports.createUser = async (req, res) => {
       role,
       email,
     });
-
+    
     res
       .status(200)
-      .json({ user: user.userName, message: "successfull", status: "success" });
+      .json({ user: user, message: "successfull", status: "success" });
   } catch (error) {
     console.log(`[${tag}] createUser:`, error);
 
@@ -60,7 +64,6 @@ exports.getAllUsers = async (req, res) => {
       res.status(400).json({ status: "error", message: errorMessage });
       return;
     }
-
     let { skip, limit, getCount, name, email } = req.query;
 
     const users = await userControllers.getAll({
@@ -115,6 +118,7 @@ exports.getUser = async (req, res) => {
     }
 
     const id = req.params.id;
+
     const user = await userControllers.getById(id);
 
     res
@@ -138,7 +142,7 @@ exports.userUpdate = async (req, res) => {
 
     const id = req.params.id;
     let { userName, email, mobile, password, role } = req.body;
-    password=hashingPassword(password)
+    password = hashingPassword(password);
 
     const user = await userControllers.updateById({
       id,
@@ -178,9 +182,15 @@ exports.fetchUserId = async (req, res) => {
   }
 };
 //!service helpers
-const validationService = async (request) => {
+const validationService = async (req) => {
+
+  let { ...data } = { ...req.body, ...req.query, ...req.params };
+  if (!Object.keys(data)[0] === true || Object.values(data).includes(undefined)) {
+    throw new userErrors.MandatoryFieldsError
+  }
+
   //server side validation
-  let errors = validationResult(request);
+  let errors = validationResult(req);
 
   if (errors.isEmpty()) {
     return false;

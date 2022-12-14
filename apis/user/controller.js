@@ -112,10 +112,15 @@ exports.getUserByEmailId = async (email) => {
 };
 
 exports.getById = async (id) => {
+
   if (id == null) {
     throw new UserErrors.MandatoryFieldsError();
   }
   const user = await UserModel.findOne({ _id: id });
 
+  if(user==null){
+    throw new UserErrors.UserEntityNotFoundError()
+
+  }
   return user;
 };

@@ -9,7 +9,7 @@ const connectDb = async () => {
   if (ENV === "testing") {
     const mongoServer = await  MongoMemoryServer.create();
     const mongoUrl = await mongoServer.getUri();
-    connect(mongoUrl)
+    await connect(mongoUrl)
     console.log("mongo testing db connected", mongoUrl);    
   }
   if(ENV ==='development'){

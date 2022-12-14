@@ -2,10 +2,7 @@ const userControllers = require("./controller");
 const { connectDb } = require("../../config/db");
 const generateRandom = require("../../helpers/generaterandonHelpers");
 const userErrors = require("./error/userErrors");
-const {
-  hashingPassword,
-  unHashingPassword,
-} = require("../../helpers/cryptoHelper");
+const { hashingPassword, unHashingPassword} = require("../../helpers/cryptoHelper");
 
 beforeAll(() => {
   connectDb();
@@ -24,7 +21,7 @@ describe("create", () => {
     expect(user.updatedAt).toBeInstanceOf(Date);
     expect(user.createdAt).toBeDefined();
     expect(user.createdAt).toBeInstanceOf(Date);
-    expect(user.createdAt < user.updatedAt).toBe(false);
+    expect(user.createdAt <= user.updatedAt).toBe(true);
     expect(user.userName).toBe(createUser.userName);
     expect(user.email).toBe(createUser.email);
     expect(user.mobile).toBe(createUser.mobile);
@@ -36,6 +33,7 @@ describe("create", () => {
   });
 
   test("it should return error message for the same email id", async () => {
+    
     const createUser = generateRandomUser();
     expect(userControllers.create).toBeInstanceOf(Function);
     await userControllers.create(createUser); //populatin db with some user
@@ -45,6 +43,7 @@ describe("create", () => {
     );
   });
 
+  
   test("it should create a user default role as a user ", async () => {
     const user = {
       userName: "testing",
@@ -287,13 +286,13 @@ describe("validate", () => {
     expect(user.id).toBeDefined();
     expect(typeof user.id).toBe("string");
     expect(user.email).toBeDefined();
-    createUser.password = unHashingPassword(createUser.password);
+    user.password = unHashingPassword(createUser.password);
 
     const emailAndPassword = {
       email: `${generateRandom.generateRandomString(15)}@gmail.com`,
-      password: createUser.password,
+      password: user.password,
     };
-    expect(user.email !== emailAndPassword.password).toBe(true);
+    expect(user.email !== emailAndPassword.email).toBe(true);
 
     expect(() => userControllers.validate(emailAndPassword)).rejects.toThrow(
       userErrors.UserNotFoundError
@@ -308,10 +307,10 @@ describe("validate", () => {
     expect(typeof user.id).toBe("string");
     expect(user.email).toBeDefined();
     expect(user.password).toBeDefined();
-    createUser.password = unHashingPassword(createUser.password);
+    user.password = unHashingPassword(user.password);
 
     const password = generateRandom.generateRandomString(8);
-    expect(password != createUser.password).toBe(true);
+    expect(password != user.password).toBe(true);
     expect(() =>
       userControllers.validate({
         email: null,
@@ -323,7 +322,7 @@ describe("validate", () => {
 /*******************************************************************************/
 
 describe("getAll", () => {
-  test("it should return the count as 5 because we set limit as 5", async () => {
+  test("it should check the limit & skip will give correct output", async () => {
     const limit = 5;
     expect(userControllers.create).toBeInstanceOf(Function);
     for (let i = 0; i < 10; i++) {
@@ -348,7 +347,7 @@ describe("getAll", () => {
     };
     let resultUser;
 
-    for (let i = 1; i < checkLimit + 1; i++) {
+    for (let i = 0; i < checkLimit ; i++) {
       resultUser = await userControllers.getAll({
         skip: params.skip,
         limit: params.limit,
