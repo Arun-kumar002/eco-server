@@ -11,7 +11,7 @@ exports.create = async ({ userName, password, mobile, role, email }) => {
   let existsUser = await UserModel.findOne({ email: email });
 
   if (existsUser) {
-    throw new UserErrors.UserExistsError();
+    throw new UserErrors.EntityExistsError();
   }
 
   let user = await UserModel.create({
@@ -73,7 +73,7 @@ exports.deleteById = async (id) => {
   const deleteuser = await UserModel.findByIdAndDelete(id);
 
   if (deleteuser === null) {
-    throw new UserErrors.UserDeleteError();
+    throw new UserErrors.EntityNotFoundError();
   }
 
   return deleteuser;
@@ -105,22 +105,20 @@ exports.getUserByEmailId = async (email) => {
   const user = await UserModel.findOne({ email });
 
   if (user === null) {
-    throw new UserErrors.UserNotFoundError();
+    throw new UserErrors.EntityNotFoundError();
   }
 
   return user;
 };
 
 exports.getById = async (id) => {
-
   if (id == null) {
     throw new UserErrors.MandatoryFieldsError();
   }
   const user = await UserModel.findOne({ _id: id });
 
-  if(user==null){
-    throw new UserErrors.UserEntityNotFoundError()
-
+  if (user == null) {
+    throw new UserErrors.UserEntityNotFoundError();
   }
   return user;
 };

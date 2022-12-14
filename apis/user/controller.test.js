@@ -39,7 +39,7 @@ describe("create", () => {
     await userControllers.create(createUser); //populatin db with some user
 
     expect(() => userControllers.create(createUser)).rejects.toThrow(
-      userErrors.UserExistsError
+      userErrors.EntityExistsError
     );
   });
 

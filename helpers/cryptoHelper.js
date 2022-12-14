@@ -20,6 +20,7 @@ const generateSHA256password = (key, salt) => {
   let hash = createHash("sha256").update(key, secret).digest("hex");
   return hash;
 };
+
 module.exports = {
   hashingPassword,
   unHashingPassword,

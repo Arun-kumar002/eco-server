@@ -24,16 +24,13 @@ exports.createUser = async (req, res) => {
       role,
       email,
     });
-    
+
     res
       .status(200)
       .json({ user: user, message: "successfull", status: "success" });
   } catch (error) {
     console.log(`[${tag}] createUser:`, error);
-
-    res
-      .status(error.errorCode)
-      .json({ message: error.message, status: "error" });
+    userErrors.handleError(error, res);
   }
 };
 
@@ -50,9 +47,8 @@ exports.validateUser = async (req, res) => {
     res.status(200).json({ user, message: "successfull", status: "success" });
   } catch (error) {
     console.log(`[${tag}] validateUser:`, error);
-    res
-      .status(error.errorCode)
-      .json({ message: error.message, status: "error" });
+
+    userErrors.handleError(error, res);
   }
 };
 
@@ -79,9 +75,8 @@ exports.getAllUsers = async (req, res) => {
       .json({ users, message: "successfully fetched", status: "success" });
   } catch (error) {
     console.log(`[${tag}] getAllUsers:`, error);
-    res
-      .status(error.errorCode)
-      .json({ message: error.message, status: "error" });
+
+    userErrors.handleError(error, res);
   }
 };
 
@@ -102,9 +97,7 @@ exports.deleteUser = async (req, res) => {
   } catch (error) {
     console.log(`[${tag}] deleteUser:`, error);
 
-    res
-      .status(error.errorCode)
-      .json({ message: error.message, status: "error" });
+    userErrors.handleError(error, res);
   }
 };
 
@@ -127,9 +120,7 @@ exports.getUser = async (req, res) => {
   } catch (error) {
     console.log(`[${tag}] getUser:`, error);
 
-    res
-      .status(error.errorCode)
-      .json({ message: error.message, status: "error" });
+    userErrors.handleError(error, res);
   }
 };
 
@@ -159,9 +150,7 @@ exports.userUpdate = async (req, res) => {
   } catch (error) {
     console.log(`[${tag}] userUpdate:`, error);
 
-    res
-      .status(error.errorCode)
-      .json({ message: error.message, status: "error" });
+    userErrors.handleError(error, res);
   }
 };
 
@@ -176,17 +165,21 @@ exports.fetchUserId = async (req, res) => {
       .json({ message: "successfull", status: "success", user: user._id });
   } catch (error) {
     console.log(`[${tag}] fetchUserId:`, error);
-    res
-      .status(error.errorCode)
-      .json({ message: error.message, status: "error" });
+    
+    userErrors.handleError(error, res);
   }
 };
+
+
 //!service helpers
 const validationService = async (req) => {
 
   let { ...data } = { ...req.body, ...req.query, ...req.params };
-  if (!Object.keys(data)[0] === true || Object.values(data).includes(undefined)) {
-    throw new userErrors.MandatoryFieldsError
+  if (
+    !Object.keys(data)[0] === true ||
+    Object.values(data).includes(undefined)
+  ) {
+    throw new userErrors.MandatoryFieldsError();
   }
 
   //server side validation
