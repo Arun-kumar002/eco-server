@@ -27,10 +27,9 @@ exports.validateAdmin = async (req, res) => {
   } catch (error) {
     console.log(`[${tag}] validateAdmin:`, error);
 
-    res
-      .status(error.errorCode)
-      .json({ message: error.message, status: "error" });
+    userErrors.handleError(error, tag, req, res);
   }
+
 };
 
 exports.addAdminUser = async (req, res) => {
@@ -54,9 +53,8 @@ exports.addAdminUser = async (req, res) => {
   } catch (error) {
     console.log(`[${tag}] addAdminUser:`, error);
 
-    res
-      .status(error.errorCode)
-      .json({ message: error.message, status: "error" });
+    userErrors.handleError(error, tag, req, res);
+
   }
 };
 
@@ -82,9 +80,8 @@ exports.updateAdminUser = async (req, res) => {
   } catch (error) {
     console.log(`[${tag}] updateAdminUser:`, error);
 
-    res
-      .status(error.errorCode)
-      .json({ message: error.message, status: "error" });
+    userErrors.handleError(error, tag, req, res);
+
   }
 };
 
@@ -107,9 +104,8 @@ exports.deleteAdminUser = async (req, res) => {
   } catch (error) {
     console.log(`[${tag}] deleteAdminUser:`, error);
 
-    res
-      .status(error.errorCode)
-      .json({ message: error.message, status: "error" });
+    userErrors.handleError(error, tag, req, res);
+
   }
 };
 

@@ -15,15 +15,7 @@ exports.createUser = async (req, res) => {
       email: req.body.email,
     };
 
-    const errorMessage = await validationService(
-      params,
-      ValidationSchema.registerSchema
-    );
-
-    if (errorMessage) {
-      res.status(400).json({ status: "error", message: errorMessage });
-      return;
-    }
+    await ValidationSchema.registerSchema.validateAsync(params);
 
     let { userName, password, mobile, role, email } = params;
     password = hashingPassword(password);
@@ -52,14 +44,7 @@ exports.validateUser = async (req, res) => {
       email: req.body.email,
     };
 
-    const errorMessage = await validationService(
-      params,
-      ValidationSchema.loginSchema
-    );
-
-    if (errorMessage) {
-      return res.status(400).json({ status: "error", message: errorMessage });
-    }
+    await ValidationSchema.loginSchema.validateAsync(params);
 
     const user = await userControllers.validate(params);
 
@@ -74,29 +59,21 @@ exports.validateUser = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const params = {
-      skip: req.query.skip,
-      limit: req.query.limit,
-      getCount: req.query.getCount,
-      name: req.query.name ? req.query.name : "",
-      email: req.query.email ? req.query.email : "",
+      skip: parseInt(req.query.skip),
+      limit: parseInt(req.query.limit),
+      getCount: !parseInt(req.query.getCount),
+      name: req.query.name,
+      email: req.query.email,
     };
 
-    const errorMessage = await validationService(
-      params,
-      ValidationSchema.getAlluserSchema
-    );
-    console.log(errorMessage);
-    if (errorMessage) {
-      res.status(400).json({ status: "error", message: errorMessage });
-      return;
-    }
+    await ValidationSchema.getAlluserSchema.validateAsync(params);
 
     let { skip, limit, getCount, name, email } = params;
 
     const users = await userControllers.getAll({
       skip,
       limit,
-      getCount: JSON.parse(getCount),
+      getCount,
       name,
       email,
     });
@@ -105,8 +82,6 @@ exports.getAllUsers = async (req, res) => {
       .status(200)
       .json({ users, message: "successfully fetched", status: "success" });
   } catch (error) {
-    console.error(`[${tag}] getAllUsers:`, error);
-
     userErrors.handleError(error, tag, req, res);
   }
 };
@@ -117,13 +92,7 @@ exports.deleteUser = async (req, res) => {
       id: req.params.id,
     };
 
-    const errorMessage = await validationService(
-      params,
-      ValidationSchema.paramsSchema
-    );
-
-    if (errorMessage)
-      res.status(400).json({ status: "error", message: errorMessage });
+    await ValidationSchema.paramsSchema.validateAsync(params);
 
     let user = await userControllers.deleteById(params.id);
 
@@ -143,19 +112,10 @@ exports.getUser = async (req, res) => {
       id: req.params.id,
     };
 
-    const errorMessage = await validationService(
-      params,
-      ValidationSchema.paramsSchema
-    );
+    await ValidationSchema.paramsSchema.validateAsync(params);
 
-    if (errorMessage) {
-      res.status(400).json({ status: "error", message: errorMessage });
-      return;
-    }
 
-    const id = params.id;
-
-    const user = await userControllers.getById(id);
+    const user = await userControllers.getById(params.id);
 
     res
       .status(200)
@@ -178,14 +138,7 @@ exports.userUpdate = async (req, res) => {
       email: req.body.email,
     };
 
-    const errorMessage = await validationService(
-      params,
-      ValidationSchema.registerSchema
-    );
-
-    if (errorMessage) {
-      res.status(400).json({ status: "error", message: errorMessage });
-    }
+    await ValidationSchema.registerSchema.validateAsync(params);
 
     let { id, userName, email, mobile, password, role } = params;
     password = hashingPassword(password);
@@ -217,10 +170,7 @@ exports.fetchUserId = async (req, res) => {
       email: req.body.email,
     };
 
-    const errorMessage = await validationService(
-      params,
-      ValidationSchema.fetchUserId
-    );
+    await ValidationSchema.fetchUserId.validateAsync(params);
 
     if (errorMessage) {
       res.status(400).json({ status: "error", message: errorMessage });
@@ -240,18 +190,3 @@ exports.fetchUserId = async (req, res) => {
 };
 
 //!service helpers
-const validationService = async (params, schema) => {
-  if (
-    !Object.keys(params)[0] === true ||
-    Object.values(params).includes(undefined)
-  ) {
-    throw new userErrors.MandatoryFieldsError();
-  }
-  //server side validation
-  const { error } = await schema.validate(params);
-  if (error) {
-    const firstError = error.details[0];
-    return { [firstError.type]: firstError.message };
-  }
-  return false;
-};

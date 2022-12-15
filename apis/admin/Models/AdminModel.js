@@ -22,17 +22,4 @@ const AdminSchmema = new Schema(
 );
 
 
-AdminSchmema.pre("save", async function () {
-  this.password = CryptoJS.AES.encrypt(this.password, PASSWORD_SECRET).toString();
-});
-
-AdminSchmema.methods.matchPassword = async function (enteredPassword) {
-
-  let password=await CryptoJS.AES.decrypt(this.password, PASSWORD_SECRET).toString(
-    CryptoJS.enc.Utf8
-  );
-  return enteredPassword==password
-};
-
-
 module.exports = model("AdminUser", AdminSchmema);

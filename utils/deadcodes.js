@@ -1,13 +1,8 @@
-
-
-
+//!if it throw an error any one see my credentials and guess the next thing we cant able to express validators
 // const UpdateUserPassword = async ({ email, password }) => {
-//     let checked = await getUserByEmail(email);
-//     if (checked === null) throw new UserError(404, "user not found ");
-  
 //     if (checked.useredit === false)
 //       throw new UserError(400, "you can't update the password");
-  
+
 //     let user = await updatingExistingUserByEmail({
 //       email,
 //       password,
@@ -15,6 +10,7 @@
 //     });
 //     return user;
 //   };
+//!violating slap principles & accidental complexity
 // let setPassword = async (req, res) => {
 //     try {
 //       let errorMessage = await validationService(req);
@@ -27,9 +23,9 @@
 //         email,
 //         password,
 //       });
-  
+
 //      res.status(200).json({user,message:''})
-        
+
 //     } catch (error) {
 //       console.log(`[${tag}] setPassword:`, error);
 //       res.status(error.statuscode).json({ message: error.message, status: "error" });
@@ -39,6 +35,7 @@
 //url=http://localhost:5000/user/setpassword
 // routes.put(`/${baseRoute}/setpassword`,validationSchema.loginSchema, userService.setPassword);
 
+//!premature optimization
 // test("it should check the users are skipped", async () => {
 //     let checklimit = 5;
 //     expect(userControllers.getAll).toBeInstanceOf(Function);
@@ -81,9 +78,10 @@
 //       if (i==skipcount) {
 //         console.log(i,result.users.length);
 //         expect(result.users.length !=checklimit).toBe(true);
-       
+
 //       }
 //     }
+//!validator using request its so costlier
 //  ///ids
 // custom: {
 //     options: (value, { req }) => {
@@ -96,11 +94,36 @@
 //   },
 // },
 
+//!accidental complixity
+
+// if (
+// /**/  !Object.keys(params)[0] === true ||
+//   Object.values(params).includes(undefined)
+// ) {
+//   throw new userErrors.MandatoryFieldsError();
+// }
+//!schema methods violating solid peinciple
+// AdminSchmema.pre("save", async function () {
+//   this.password = CryptoJS.AES.encrypt(this.password, PASSWORD_SECRET).toString();
+// });
+
+// AdminSchmema.methods.matchPassword = async function (enteredPassword) {
+
+//   let password=await CryptoJS.AES.decrypt(this.password, PASSWORD_SECRET).toString(
+//     CryptoJS.enc.Utf8
+//   );
+//   return enteredPassword==password
+// };
 
 
-  // if (
-  //   !Object.keys(params)[0] === true ||
-  //   Object.values(params).includes(undefined)
-  // ) {
-  //   throw new userErrors.MandatoryFieldsError();
-  // }
+
+//!convert custom fun to error instance now its controllable 
+//const validationService = async (params, schema) => {
+  //server side validation
+//   const { error } = await schema.validate(params);
+//   if (error) {
+//     const firstError = error.details[0];
+//     return { [firstError.type]: firstError.message };
+//   }
+//   return false;
+// };

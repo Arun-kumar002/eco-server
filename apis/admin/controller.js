@@ -2,7 +2,7 @@
 const AdminModel = require("./Models/AdminModel");
 const { generateToken } = require("../../helpers/generaterandonHelpers");
 const AdminErrors = require("./error/adminErrors");
-
+const { hashingPassword, unHashingPassword} = require("../../helpers/cryptoHelper");
 
 
 exports.validate = async ({ email, password }) => {
@@ -10,9 +10,9 @@ exports.validate = async ({ email, password }) => {
   if (!user) {
     throw new AdminErrors.EntityNotFoundError();
   }
-  let validate=await user.matchPassword(password)
+  let userPassword=await unHashingPassword(user.password)
 
-  if (validate==false) {
+  if (userPassword !== password) {
     throw new AdminErrors.CredentialsMissmatchError();
   }
 
@@ -26,6 +26,7 @@ exports.create = async ({ email, password }) => {
   if (user) {
     throw new AdminErrors.EntityExistsError();
   }
+  password=hashingPassword(password)
 
   return await AdminModel.create({ email, password });
 };
@@ -37,7 +38,8 @@ exports.update = async ({ email, password }) => {
   if (adminUser === null) {
     throw new AdminErrors.EntityNotFoundError();
   }
-
+  password=hashingPassword(password)
+  
   let updated = adminUser.updateOne({ password:password }, { new: true });
   return updated;
 };
