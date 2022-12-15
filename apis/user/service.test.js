@@ -3,7 +3,7 @@ const sinon = require("sinon");
 const { connectDb } = require("../../config/db");
 const userService = require("./services");
 const userControllers = require("./controller");
-const { UserErrorCodes } = require("./error/userErrors");
+const { HTTPErrorCodes } = require("./error/userErrors");
 beforeAll(async () => {
   await connectDb();
 });
@@ -52,7 +52,7 @@ describe("[userService]: createUser", () => {
     await res.json();
 
     expect(res._headers["content-type"]).toBe("application/json");
-    expect(res.statusCode).toBe(UserErrorCodes.MANDATORY_FIELDS_ERROR);
+    expect(res.statusCode).toBe(HTTPErrorCodes.MANDATORY_FIELDS_ERROR);
     expect(userControllers.create).toHaveBeenCalledTimes(0);
   });
 
@@ -75,7 +75,7 @@ describe("[userService]: createUser", () => {
     await res.json();
 
     expect(res._headers["content-type"]).toBe("application/json");
-    expect(res.statusCode).toBe(UserErrorCodes.MANDATORY_FIELDS_ERROR);
+    expect(res.statusCode).toBe(HTTPErrorCodes.MANDATORY_FIELDS_ERROR);
     expect(userControllers.create).toHaveBeenCalledTimes(0);
 
   });
@@ -121,7 +121,7 @@ describe("[userService]: validate", () => {
     await res.json();
 
     expect(res._headers["content-type"]).toBe("application/json");
-    expect(res.statusCode).toBe(UserErrorCodes.MANDATORY_FIELDS_ERROR);
+    expect(res.statusCode).toBe(HTTPErrorCodes.MANDATORY_FIELDS_ERROR);
     expect(userControllers.validate).toHaveBeenCalledTimes(0);
   });
 
@@ -141,7 +141,7 @@ describe("[userService]: validate", () => {
     await res.json();
 
     expect(res._headers["content-type"]).toBe("application/json");
-    expect(res.statusCode).toBe(UserErrorCodes.MANDATORY_FIELDS_ERROR);
+    expect(res.statusCode).toBe(HTTPErrorCodes.MANDATORY_FIELDS_ERROR);
     expect(userControllers.validate).toHaveBeenCalledTimes(0);
   });
 });
@@ -194,7 +194,7 @@ describe("[userService]: userUpdate", () => {
     await userService.userUpdate(req, res);
     await res.json();
     expect(res._headers["content-type"]).toBe("application/json");
-    expect(res.statusCode).toBe(UserErrorCodes.MANDATORY_FIELDS_ERROR);
+    expect(res.statusCode).toBe(HTTPErrorCodes.MANDATORY_FIELDS_ERROR);
     expect(userControllers.updateById).toHaveBeenCalledTimes(0);
   });
 });
@@ -239,7 +239,7 @@ describe("[userService]: getAllUsers", () => {
     await res.json();
 
     expect(res._headers["content-type"]).toBe("application/json");
-    expect(res.statusCode).toBe(UserErrorCodes.MANDATORY_FIELDS_ERROR);
+    expect(res.statusCode).toBe(HTTPErrorCodes.MANDATORY_FIELDS_ERROR);
     expect(userControllers.getAll).toHaveBeenCalledTimes(0);
   });
 });
@@ -278,7 +278,7 @@ describe("[userService] : getUser", () => {
     await res.json();
 
     expect(res._headers["content-type"]).toBe("application/json");
-    expect(res.statusCode).toBe(UserErrorCodes.MANDATORY_FIELDS_ERROR);
+    expect(res.statusCode).toBe(HTTPErrorCodes.MANDATORY_FIELDS_ERROR);
     expect(userControllers.getById).toHaveBeenCalledTimes(0);
   });
 });
@@ -317,7 +317,7 @@ describe("[userService]: deleteUser", () => {
     await res.json();
 
     expect(res._headers["content-type"]).toBe("application/json");
-    expect(res.statusCode).toBe(UserErrorCodes.MANDATORY_FIELDS_ERROR);
+    expect(res.statusCode).toBe(HTTPErrorCodes.MANDATORY_FIELDS_ERROR);
     expect(userControllers.deleteById).toHaveBeenCalledTimes(0);
   });
 });

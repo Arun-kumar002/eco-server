@@ -1,12 +1,19 @@
 const { validationResult } = require("express-validator");
 const userControllers = require("./controller");
-const tag = "user-service";
 const { hashingPassword } = require("../../helpers/cryptoHelper");
 const userErrors = require("./error/userErrors");
+const tag = "user-service";
 
 exports.createUser = async (req, res) => {
   try {
-    const errorMessage = await validationService(req);
+    const params = {
+      userName: req.body.userName,
+      password: req.body.password,
+      mobile: req.body.mobile,
+      role: req.body.role,
+      email: req.body.email,
+    };
+    const errorMessage = await validationService(params);
 
     if (errorMessage) {
       res.status(400).json({ status: "error", message: errorMessage });
@@ -14,7 +21,6 @@ exports.createUser = async (req, res) => {
     }
 
     let { userName, password, mobile, role, email } = req.body;
-
     password = hashingPassword(password);
 
     const user = await userControllers.create({
@@ -29,8 +35,8 @@ exports.createUser = async (req, res) => {
       .status(200)
       .json({ user: user, message: "successfull", status: "success" });
   } catch (error) {
-    console.log(`[${tag}] createUser:`, error);
-    userErrors.handleError(error, res);
+    console.error(`[${tag}] createUser:`, error);
+    userErrors.handleError(error, tag, req, res);
   }
 };
 
@@ -48,7 +54,7 @@ exports.validateUser = async (req, res) => {
   } catch (error) {
     console.log(`[${tag}] validateUser:`, error);
 
-    userErrors.handleError(error, res);
+    userErrors.handleError(error, tag, req, res);
   }
 };
 
@@ -76,7 +82,7 @@ exports.getAllUsers = async (req, res) => {
   } catch (error) {
     console.log(`[${tag}] getAllUsers:`, error);
 
-    userErrors.handleError(error, res);
+    userErrors.handleError(error, tag, req, res);
   }
 };
 
@@ -97,7 +103,7 @@ exports.deleteUser = async (req, res) => {
   } catch (error) {
     console.log(`[${tag}] deleteUser:`, error);
 
-    userErrors.handleError(error, res);
+    userErrors.handleError(error, tag, req, res);
   }
 };
 
@@ -120,7 +126,7 @@ exports.getUser = async (req, res) => {
   } catch (error) {
     console.log(`[${tag}] getUser:`, error);
 
-    userErrors.handleError(error, res);
+    userErrors.handleError(error, tag, req, res);
   }
 };
 
@@ -128,8 +134,9 @@ exports.userUpdate = async (req, res) => {
   try {
     const errorMessage = await validationService(req);
 
-    if (errorMessage)
+    if (errorMessage) {
       res.status(400).json({ status: "error", message: errorMessage });
+    }
 
     const id = req.params.id;
     let { userName, email, mobile, password, role } = req.body;
@@ -150,11 +157,12 @@ exports.userUpdate = async (req, res) => {
   } catch (error) {
     console.log(`[${tag}] userUpdate:`, error);
 
-    userErrors.handleError(error, res);
+    userErrors.handleError(error, tag, req, res);
   }
 };
 
 //!test services
+
 exports.fetchUserId = async (req, res) => {
   try {
     const { email } = req.body;
@@ -165,19 +173,16 @@ exports.fetchUserId = async (req, res) => {
       .json({ message: "successfull", status: "success", user: user._id });
   } catch (error) {
     console.log(`[${tag}] fetchUserId:`, error);
-    
-    userErrors.handleError(error, res);
+
+    userErrors.handleError(error, tag, req, res);
   }
 };
 
-
 //!service helpers
-const validationService = async (req) => {
-
-  let { ...data } = { ...req.body, ...req.query, ...req.params };
+const validationService = async (params, req) => {
   if (
-    !Object.keys(data)[0] === true ||
-    Object.values(data).includes(undefined)
+    !Object.keys(params)[0] === true ||
+    Object.values(params).includes(undefined)
   ) {
     throw new userErrors.MandatoryFieldsError();
   }

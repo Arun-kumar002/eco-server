@@ -13,7 +13,6 @@ exports.create = async ({ userName, password, mobile, role, email }) => {
   if (existsUser) {
     throw new UserErrors.EntityExistsError();
   }
-
   let user = await UserModel.create({
     userName,
     password,
