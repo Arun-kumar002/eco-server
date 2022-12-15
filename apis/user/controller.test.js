@@ -379,7 +379,6 @@ describe("getAll", () => {
     expect(result.count).toBeDefined();
 
     for (let user of result.users) {
-      console.log(user.updatedAt);
       expect(user).toBeDefined();
       expect(user.id).toBeDefined();
       expect(typeof user.id).toBe("string");

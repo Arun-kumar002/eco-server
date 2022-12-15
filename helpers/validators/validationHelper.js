@@ -15,9 +15,9 @@ const loginSchema = joi.object({
 });
 
 const getAlluserSchema = joi.object({
-  limit: joi.string().required("limit is required"),
-  skip: joi.string().required("skip is required"),
-  getCount: joi.string().required("getCount is required"),
+  limit: joi.exist(),
+  skip: joi.exist(),
+  getCount: joi.required("getCount is required"),
   name:joi.allow(),
   email:joi.allow()
 });

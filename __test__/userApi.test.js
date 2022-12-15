@@ -11,13 +11,13 @@ let baseRoute = "api/v1/user";
 describe("/user post", () => {
   test("test should create a new user", async () => {
     let createUser = generateRandomUser();
-    let user = await supertest(app).post(`/${baseRoute}/`).send(createUser);
-    expect(user).toBeDefined();
-    expect(user.headers["content-type"]).toBe(
+    let response = await supertest(app).post(`/${baseRoute}/`).send(createUser);
+    expect(response).toBeDefined();
+    expect(response.headers["content-type"]).toBe(
       "application/json; charset=utf-8"
     );
-    expect(user.statusCode).toBe(200);
-    let result = user._body.user;
+    expect(response.statusCode).toBe(200);
+    let result = response._body.user;
     expect(result).toBeDefined();
     expect(result._id).toBeDefined();
     expect(typeof result._id).toBe("string");
@@ -36,76 +36,72 @@ describe("/user post", () => {
   test("test should return 400 user already present", async () => {
     let createUser = generateRandomUser();
     await supertest(app).post(`/${baseRoute}/`).send(createUser).expect(200); //populating db with some users
-    let user=await supertest(app)
-      .post(`/${baseRoute}/`)
-      .send(createUser)
-      expect(user.statusCode).toBe(HTTPErrorCodes.ENTITY_ALREADY_EXISTS);
+    let response = await supertest(app).post(`/${baseRoute}/`).send(createUser);
+    expect(response.statusCode).toBe(HTTPErrorCodes.ENTITY_ALREADY_EXISTS);
   });
-
 });
 //http://localhost:5000/user/login
 describe("/user login", () => {
   test("test should check a user is existing", async () => {
     let createUser = generateRandomUser();
 
-    let user = await supertest(app).post(`/${baseRoute}/`).send(createUser);
+    let response = await supertest(app).post(`/${baseRoute}/`).send(createUser);
     //populating db
-    expect(user.statusCode).toBe(200);
-
-    let result = user._body.user;
+    expect(response.statusCode).toBe(200);
+    let result = response._body.user;
     expect(result).toBeDefined();
     expect(result._id).toBeDefined();
     expect(typeof result._id).toBe("string");
     expect(result.password).toBeDefined();
     expect(result.email).toBeDefined();
 
-    let validateUser = await supertest(app)
+    let validateUserResponse = await supertest(app)
       .post(`/${baseRoute}` + `/login`)
       .send({ email: createUser.email, password: createUser.password });
 
-    expect(validateUser.statusCode).toBe(200);
-    expect(validateUser).toBeDefined();
-    expect(validateUser._body.user.user).toBeDefined();
-    expect(validateUser._body.user.token).toBeDefined();
-    let validateUserResult = validateUser._body.user.user;
-    expect(validateUserResult).toBeDefined();
-    expect(validateUserResult._id).toBeDefined();
-    expect(typeof validateUserResult._id).toBe("string");
-    expect(validateUserResult.userName).toBeDefined();
-    expect(validateUserResult.mobile).toBeDefined();
-    expect(validateUserResult.password).toBeDefined();
-    expect(validateUserResult.role).toBeDefined();
-    expect(validateUserResult.email).toBeDefined();
-    expect(validateUserResult.userName).toBe(result.userName);
-    expect(validateUserResult.mobile).toBe(result.mobile);
-    expect(crypto.unHashingPassword(result.password)).toBe(
-      validateUserResult.password
-    );
-    expect(validateUserResult.email).toBe(result.email);
-    expect(validateUserResult.role).toBe(result.role);
+    expect(validateUserResponse.statusCode).toBe(200);
+    expect(validateUserResponse).toBeDefined();
+    expect(validateUserResponse._body.user.user).toBeDefined();
+    expect(validateUserResponse._body.user.token).toBeDefined();
+    let user = validateUserResponse._body.user.user;
+    expect(user).toBeDefined();
+    expect(user._id).toBeDefined();
+    expect(typeof user._id).toBe("string");
+    expect(user.userName).toBeDefined();
+    expect(user.mobile).toBeDefined();
+    expect(user.password).toBeDefined();
+    expect(user.role).toBeDefined();
+    expect(user.email).toBeDefined();
+    expect(user.userName).toBe(result.userName);
+    expect(user.mobile).toBe(result.mobile);
+    expect(crypto.unHashingPassword(result.password)).toBe(user.password);
+    expect(user.email).toBe(result.email);
+    expect(user.role).toBe(result.role);
   });
 
   test("test should check a user login with wrong credentials", async () => {
     let createUser = generateRandomUser();
 
-    let user = await supertest(app)
+    let response = await supertest(app)
       .post(`/${baseRoute}/`)
       .send(createUser)
       .expect(200); //populating db
-    let result = user._body.user;
-    expect(result).toBeDefined();
-    expect(result._id).toBeDefined();
-    expect(typeof result._id).toBe("string");
-    expect(result.password).toBeDefined();
-    expect(result.email).toBeDefined();
+    let user = response._body.user;
+    expect(user).toBeDefined();
+    expect(user._id).toBeDefined();
+    expect(typeof user._id).toBe("string");
+    expect(user.password).toBeDefined();
+    expect(user.email).toBeDefined();
 
-    let validateUser=await supertest(app)
+    let validateUserResponse = await supertest(app)
       .post(`/${baseRoute}` + `/login`)
       .send({
-        email: result.email,
+        email: user.email,
         password: generateRandom.generateRandomString(7),
-      })
-      expect(validateUser.statusCode).toBe(HTTPErrorCodes.CREDENTIAL_MISSMATCH);
+      });
+    expect(validateUserResponse.statusCode).toBe(
+      HTTPErrorCodes.CREDENTIAL_MISSMATCH
+    );
   });
 });
 
@@ -115,11 +111,11 @@ describe("/user get", () => {
   test("test should return all user", async () => {
     for (let i = 0; i < 10; i++) {
       const createUser = generateRandomUser(i); //populating db with some users
-      let user = await supertest(app)
+      let response = await supertest(app)
         .post(`/${baseRoute}/`)
         .send(createUser)
         .expect(200);
-      expect(user.text).toBeDefined();
+      expect(response).toBeDefined();
     }
 
     let result = await supertest(app)
@@ -144,9 +140,8 @@ describe("/user get", () => {
   });
 
   test("test should return 400 for missing query", async () => {
-    let result=await supertest(app)
-      .get(`/${baseRoute}?limit=0&skip=0`)
-      expect(result.statusCode).toBe(HTTPErrorCodes.VALIDATION_ERROR);
+    let response = await supertest(app).get(`/${baseRoute}?limit=0&skip=0`);
+    expect(response.statusCode).toBe(HTTPErrorCodes.VALIDATION_ERROR);
   });
 });
 
@@ -154,24 +149,37 @@ describe("/user get", () => {
 //http://localhost:5000/user/:id
 describe("/user update ", () => {
   test("test should updating a existing user", async () => {
-    let createUser = generateRandomUser();
-    await supertest(app).post(`/${baseRoute}/`).send(createUser).expect(200); //populate db with some user
+    const createUser = generateRandomUser();
+    const response = await supertest(app)
+      .post(`/${baseRoute}/`)
+      .send(createUser);
+    expect(response).toBeDefined();
+    expect(response.statusCode).toBe(200); //populate db with some user
+    expect(response._body.user).toBeDefined();
+    expect(response._body.user._id).toBeDefined();
+    const id = response._body.user._id;
 
-    let getinguserid = await supertest(app)
-      .post(`/${baseRoute}` + `/id`)
-      .send({
-        email: createUser.email,
-      })
-      .expect(200);
-
-    let parse = JSON.parse(getinguserid.text);
-    let id = parse.user;
-
-    console.log("updateuser-id");
-    await supertest(app)
+    const updateUser = generateRandomUser();
+    let updateResponse = await supertest(app)
       .put(`/${baseRoute}` + `/${id}`)
-      .send({ ...createUser })
-      .expect(200);
+      .send(updateUser);
+
+    expect(updateResponse).toBeDefined();
+    expect(updateResponse.statusCode).toBe(200);
+    let result = updateResponse._body.user;
+    expect(result).toBeDefined();
+    expect(result._id).toBeDefined();
+    expect(typeof result._id).toBe("string");
+    expect(result.userName).toBeDefined();
+    expect(result.mobile).toBeDefined();
+    expect(result.password).toBeDefined();
+    expect(result.role).toBeDefined();
+    expect(result.email).toBeDefined();
+    expect(result.userName).toBe(updateUser.userName);
+    expect(result.mobile).toBe(updateUser.mobile);
+    expect(crypto.unHashingPassword(result.password)).toBe(updateUser.password);
+    expect(result.email).toBe(updateUser.email);
+    expect(result.role).toBe(updateUser.role);
   });
 });
 
@@ -179,21 +187,37 @@ describe("/user update ", () => {
 //http://localhost:5000/user/6390725d04412d860821ef72
 describe("/user delete", () => {
   test("test should delete a existing user", async () => {
-    let createUser = generateRandomUser();
-    await supertest(app).post(`/${baseRoute}/`).send(createUser).expect(200);
-
-    let result = await supertest(app)
-      .post(`/${baseRoute}` + `/id`)
-      .send({
-        email: createUser.email,
-      })
+    const createUser = generateRandomUser();
+    const response = await supertest(app)
+      .post(`/${baseRoute}/`)
+      .send(createUser)
       .expect(200);
-    let parse = JSON.parse(result.text);
-    let id = parse.user;
+    expect(response).toBeDefined();
+    expect(response.statusCode).toBe(200);
+    expect(response._body.user).toBeDefined();
+    expect(response._body.user._id).toBeDefined();
+    const id = response._body.user._id;
 
-    await supertest(app).delete(`/${baseRoute}/${id}`).expect(200);
+    let deleteResponse=await supertest(app).delete(`/${baseRoute}/${id}`)
+    expect(deleteResponse.statusCode).toBe(200);
+    let result = deleteResponse._body.user;
+
+    expect(result).toBeDefined();
+    expect(result._id).toBeDefined();
+    expect(typeof result._id).toBe("string");
+    expect(result.userName).toBeDefined();
+    expect(result.mobile).toBeDefined();
+    expect(result.password).toBeDefined();
+    expect(result.role).toBeDefined();
+    expect(result.email).toBeDefined();
+    expect(result.userName).toBe(createUser.userName);
+    expect(result.mobile).toBe(createUser.mobile);
+    expect(crypto.unHashingPassword(result.password)).toBe(createUser.password);
+    expect(result.email).toBe(createUser.email);
+    expect(result.role).toBe(createUser.role);
   });
 });
+
 
 /************************************************************************/
 const generateRandomUser = (i) => {

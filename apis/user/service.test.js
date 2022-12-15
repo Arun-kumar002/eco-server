@@ -27,11 +27,10 @@ describe("[userService]: createUser", () => {
 
     await userService.createUser(req, res);
     
-    console.log("[user Service] create res", res)
-
     expect(res.statusCode).toBe(200);
     expect(userControllers.create).toHaveBeenCalledTimes(1);
     expect(res._headers["content-type"]).toBe("application/json");
+
   });
 
   test("it should fail to call controller for {email:required} validation failed", async () => {

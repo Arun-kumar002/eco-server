@@ -74,22 +74,23 @@ exports.validateUser = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const params = {
-      name: req.query.name,
-      email: req.query.email,
       skip: req.query.skip,
       limit: req.query.limit,
       getCount: req.query.getCount,
+      name: req.query.name ? req.query.name : "",
+      email: req.query.email ? req.query.email : "",
     };
 
     const errorMessage = await validationService(
       params,
       ValidationSchema.getAlluserSchema
     );
-
+    console.log(errorMessage);
     if (errorMessage) {
       res.status(400).json({ status: "error", message: errorMessage });
       return;
     }
+
     let { skip, limit, getCount, name, email } = params;
 
     const users = await userControllers.getAll({
@@ -176,7 +177,7 @@ exports.userUpdate = async (req, res) => {
       role: req.body.role,
       email: req.body.email,
     };
-   console.log(params);
+
     const errorMessage = await validationService(
       params,
       ValidationSchema.registerSchema
@@ -225,7 +226,7 @@ exports.fetchUserId = async (req, res) => {
       res.status(400).json({ status: "error", message: errorMessage });
     }
 
-    const { email } =params;
+    const { email } = params;
     const user = await userControllers.getUserByEmailId(email);
 
     res
@@ -240,8 +241,14 @@ exports.fetchUserId = async (req, res) => {
 
 //!service helpers
 const validationService = async (params, schema) => {
+  if (
+    !Object.keys(params)[0] === true ||
+    Object.values(params).includes(undefined)
+  ) {
+    throw new userErrors.MandatoryFieldsError();
+  }
   //server side validation
-  const { error, values } = await schema.validate(params);
+  const { error } = await schema.validate(params);
   if (error) {
     const firstError = error.details[0];
     return { [firstError.type]: firstError.message };
