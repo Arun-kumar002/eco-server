@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
 const joi = require("joi");
 const userErrors=require('../../apis/user/error/userErrors')
-const registerSchema = joi.object({
+
+exports.registerSchema = joi.object({
   userName: joi.string().required().label('userName').error((error)=> {
     throw new userErrors.ValidationError('userName is Required')
   }),
@@ -17,12 +17,10 @@ const registerSchema = joi.object({
   role: joi.string().optional().label('Role').error(()=> {
     throw new userErrors.ValidationError('The role should be a string type')
   }),
-  id: joi.string().optional().label('Id').error(()=> {
-    throw new userErrors.ValidationError('Id sholud be valid and string type')
-  }),
+
 });
 
-const loginSchema = joi.object({
+exports.loginSchema = joi.object({
   email: joi.string().email({tlds: { allow: ['com', 'net'] } }).required().label('Email').error(()=> {
     throw new userErrors.ValidationError('please Enter valid email')
   }),
@@ -31,7 +29,7 @@ const loginSchema = joi.object({
   }),
 });
 
-const getAlluserSchema = joi.object({
+exports.getAlluserSchema = joi.object({
   limit: joi.number().integer().required().label('Limit').error(()=> {
     throw new userErrors.ValidationError('limit should be pasitive integer & required')
   }),
@@ -49,12 +47,13 @@ const getAlluserSchema = joi.object({
   }),
 });
 
-const paramsSchema = joi.object({
+exports.paramsSchema = joi.object({
   id: joi.string().required().label('Id').error(()=> {
     throw new userErrors.ValidationError('please Enter valid id')
   }),
 });
-const addAdminUserSchema = joi.object({
+
+exports.addAdminUserSchema = joi.object({
   email: joi.string().email({tlds: { allow: ['com', 'net'] } }).required().label('Email').error(()=> {
     throw new userErrors.ValidationError('please Enter valid email')
   }),
@@ -63,24 +62,35 @@ const addAdminUserSchema = joi.object({
   }),
 });
 
-const deleteAdminUser = joi.object({
-  email: joi.string().email({tlds: { allow: ['com', 'net'] } }).required().label('Email').error(()=> {
-    throw new userErrors.ValidationError('please Enter valid email')
-  }),
-});
-const fetchUserId = joi.object({
+exports.deleteAdminUser = joi.object({
   email: joi.string().email({tlds: { allow: ['com', 'net'] } }).required().label('Email').error(()=> {
     throw new userErrors.ValidationError('please Enter valid email')
   }),
 });
 
+exports.fetchUserId = joi.object({
+  email: joi.string().email({tlds: { allow: ['com', 'net'] } }).required().label('Email').error(()=> {
+    throw new userErrors.ValidationError('please Enter valid email')
+  }),
+});
 
-module.exports = {
-  registerSchema,
-  loginSchema,
-  getAlluserSchema,
-  paramsSchema,
-  addAdminUserSchema,
-  deleteAdminUser,
-  fetchUserId,
-};
+exports.updateSchema=joi.object({
+  userName: joi.string().required().label('userName').error((error)=> {
+    throw new userErrors.ValidationError('userName is Required')
+  }),
+  password: joi.string().min(5).max(15).required().label('Password').error(()=> {
+    throw new userErrors.ValidationError('Password is Required 5 to 15 chr')
+  }),
+  email: joi.string().email({tlds: { allow: ['com', 'net'] } }).required().label('Email').error(()=> {
+    throw new userErrors.ValidationError('please Enter valid email')
+  }),
+  mobile: joi.number().required().label('Mobile').error(()=> {
+    throw new userErrors.ValidationError('mobile no is required')
+  }),
+  role: joi.string().optional().label('Role').error(()=> {
+    throw new userErrors.ValidationError('The role should be a string type')
+  }),
+  id: joi.string().required().label('Id').error(()=> {
+    throw new userErrors.ValidationError('Id sholud be valid & required')
+  }),
+});

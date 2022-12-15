@@ -61,7 +61,7 @@ exports.getAllUsers = async (req, res) => {
     const params = {
       skip: parseInt(req.query.skip),
       limit: parseInt(req.query.limit),
-      getCount: !parseInt(req.query.getCount),
+      getCount: req.query.getCount ===undefined? undefined: !parseInt(req.query.getCount),
       name: req.query.name,
       email: req.query.email,
     };
@@ -138,7 +138,7 @@ exports.userUpdate = async (req, res) => {
       email: req.body.email,
     };
 
-    await ValidationSchema.registerSchema.validateAsync(params);
+    await ValidationSchema.updateSchema.validateAsync(params);
 
     let { id, userName, email, mobile, password, role } = params;
     password = hashingPassword(password);
