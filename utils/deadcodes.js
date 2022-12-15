@@ -1,10 +1,4 @@
-class errorResponse extends Error{
-    constructor(message,statuscode){
-        super(message)
-        this.statuscode = statuscode
-    }
-}
-module.exports = errorResponse
+
 
 
 // const UpdateUserPassword = async ({ email, password }) => {
@@ -90,4 +84,23 @@ module.exports = errorResponse
        
 //       }
 //     }
-//   });
+//  ///ids
+// custom: {
+//     options: (value, { req }) => {
+//       let isValid = mongoose.Types.ObjectId.isValid(value);
+//       if (!isValid) {
+//         throw new Error("user id invalid");
+//       }
+//       return true;
+//     },
+//   },
+// },
+
+
+
+  // if (
+  //   !Object.keys(params)[0] === true ||
+  //   Object.values(params).includes(undefined)
+  // ) {
+  //   throw new userErrors.MandatoryFieldsError();
+  // }

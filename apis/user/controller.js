@@ -4,6 +4,7 @@ const UserErrors = require("./error/userErrors");
 const { unHashingPassword } = require("../../helpers/cryptoHelper");
 
 exports.create = async ({ userName, password, mobile, role, email }) => {
+
   if (userName === null || email === null) {
     throw new UserErrors.MandatoryFieldsError();
   }
@@ -97,10 +98,13 @@ exports.updateById = async ({
   return updated;
 };
 
+
 exports.getUserByEmailId = async (email) => {
+
   if (email == null) {
     throw new UserErrors.MandatoryFieldsError();
   }
+
   const user = await UserModel.findOne({ email });
 
   if (user === null) {
@@ -110,14 +114,20 @@ exports.getUserByEmailId = async (email) => {
   return user;
 };
 
+
 exports.getById = async (id) => {
+
   if (id == null) {
     throw new UserErrors.MandatoryFieldsError();
   }
+
   const user = await UserModel.findOne({ _id: id });
 
   if (user == null) {
     throw new UserErrors.UserEntityNotFoundError();
   }
+
   return user;
+
 };
+

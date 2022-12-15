@@ -8,12 +8,12 @@ const AdminErrors = require("./error/adminErrors");
 exports.validate = async ({ email, password }) => {
   const user = await AdminModel.findOne({ email }).select("+password");
   if (!user) {
-    throw new AdminErrors.AdminEntityNotFoundError();
+    throw new AdminErrors.EntityNotFoundError();
   }
   let validate=await user.matchPassword(password)
 
   if (validate==false) {
-    throw new AdminErrors.AdminPasswordError();
+    throw new AdminErrors.CredentialsMissmatchError();
   }
 
   const token = generateToken(user._id);
@@ -24,7 +24,7 @@ exports.validate = async ({ email, password }) => {
 exports.create = async ({ email, password }) => {
   const user = await AdminModel.findOne({ email }).select("+password");
   if (user) {
-    throw new AdminErrors.AdminExists();
+    throw new AdminErrors.EntityExistsError();
   }
 
   return await AdminModel.create({ email, password });
@@ -35,7 +35,7 @@ exports.update = async ({ email, password }) => {
   let adminUser = await AdminModel.findOne({ email: email });
 
   if (adminUser === null) {
-    throw new AdminErrors.AdminUpdateError();
+    throw new AdminErrors.EntityNotFoundError();
   }
 
   let updated = adminUser.updateOne({ password:password }, { new: true });
@@ -50,5 +50,5 @@ exports.deleteAdminUserByEmail = async ({ email }) => {
     return;
   }
 
-  throw new AdminErrors.UserDeleteError();
+  throw new AdminErrors.EntityNotFoundError();
 };

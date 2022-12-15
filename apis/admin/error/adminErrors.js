@@ -1,64 +1,85 @@
-const AdminErrorCode = {
-  ENTITY_NOT_FOUND: 404,
-  CREDENTIALS_MISSMATCH: 403,
-  ENTITY_ALREADY_EXISTS: 403,
-  ENTITY_UPDATE_FAILED: 304,
-  ENTITY_DELETE_FAILED: 304,
-  ENTITY_ID_INVALID: 204,
+const UserErrorCode = {
+  ENTITY_NOT_FOUND: 101,
+  CREDENTIAL_MISSMATCH: 102,
+  ENTITY_ALREADY_EXISTS: 103,
+  ENTITY_ID_INVALID: 106,
+  MANDATORY_FIELDS_ERROR: 107,
+  VALIDATION_ERROR: 108,
+};
+class BaseError extends Error {
+  constructor(errorCode, message) {
+    super();
+    this.message = message;
+    this.errorCode = errorCode;
+  }
+}
+
+class MandatoryFieldsError extends BaseError {
+  constructor() {
+    super(UserErrorCode.MANDATORY_FIELDS_ERROR, "mandatory fields missing.");
+  }
+}
+class EntityNotFoundError extends BaseError {
+  constructor() {
+    super(UserErrorCode.ENTITY_NOT_FOUND, "user entity not found.");
+  }
+}
+class CredentialsMissmatchError extends BaseError {
+  constructor() {
+    super(UserErrorCode.CREDENTIAL_MISSMATCH, "password mismatch");
+  }
+}
+class EntityExistsError extends BaseError {
+  constructor() {
+    super(UserErrorCode.ENTITY_ALREADY_EXISTS, "user email id already exist");
+  }
+}
+
+const HTTPErrorCodes = {
+  ENTITY_NOT_FOUND: 401,
+  CREDENTIAL_MISSMATCH: 403,
+  ENTITY_ALREADY_EXISTS: 401,
+  ENTITY_ID_INVALID: 407,
+  MANDATORY_FIELDS_ERROR: 400,
   VALIDATION_ERROR: 400,
-  NOT_FOUND: 404,
 };
 
-class AdminError extends Error {
-  constructor(errorCode, message) {
-    super(message);
-    this.errorCode = errorCode;
-    this.message = message;
+const handleError = (error, tag, req, res) => {
+  if (error instanceof BaseError && error.errorCode === 101) {
+    res.status(HTTPErrorCodes.ENTITY_NOT_FOUND).json({ message: "Entity not found", status: "error" });
+    return
   }
-}
 
-class AdminEntityNotFoundError extends Error {
-  constructor() {
-    super();
-    this.message = "Admin entity not found.";
-    this.errorCode = AdminErrorCodes.ENTITY_NOT_FOUND;
+  if (error instanceof BaseError && error.errorCode === 102) {
+    res.status(HTTPErrorCodes.CREDENTIAL_MISSMATCH).json({ message: "invalid email & password", status: "error" });
+    return
   }
-}
-class AdminPasswordError extends Error {
-  constructor() {
-    super();
-    this.message = "password mismatch";
-    this.errorCode = AdminErrorCodes.CREDENTIALS_MISSMATCH;
+
+  if (error instanceof BaseError && error.errorCode === 103) {
+    res.status(HTTPErrorCodes.ENTITY_ALREADY_EXISTS).json({ message: "Entity already exist", status: "error" });
+    return
   }
-}
-class AdminExists extends Error {
-  constructor() {
-    super();
-    this.message = "admin id already exist";
-    this.errorCode = AdminErrorCodes.ENTITY_ALREADY_EXISTS;
+
+  if (error instanceof BaseError && error.errorCode === 107) {
+    res.status(HTTPErrorCodes.MANDATORY_FIELDS_ERROR).json({ message: "Fill all mandatatory fields", status: "error" });
+    return
   }
-}
-class AdminUpdateError extends Error {
-  constructor() {
-    super();
-    this.message = "admin update failed";
-    this.errorCode = AdminErrorCodes.ENTITY_UPDATE_FAILED;
+  if (error instanceof BaseError && error.errorCode === 108) {
+    res.status(HTTPErrorCodes.MANDATORY_FIELDS_ERROR).json({ message: "Fill all mandatatory fields", status: "error" });
+    return
   }
-}
-class UserDeleteError extends Error {
-  constructor() {
-    super();
-    this.message = "user delete failed";
-    this.errorCode = AdminErrorCodes.ENTITY_DELETE_FAILED;
-  }
-}
-const AdminErrorCodes = AdminErrorCode;
+  
+  console.error(`[handlerError]:${tag} path-${req.path}, Errorclass:${error.name}:${error.message}. ${error.stack}. params - ${req.params},body -${req.body}, query -${req.query}`);
+  res.status(500).json({message:'internal server error',status:'error'})
+  return
+  
+};
+
 module.exports = {
-  AdminError,
-  AdminEntityNotFoundError,
-  AdminPasswordError,
-  AdminExists,
-  AdminUpdateError,
-  UserDeleteError,
-  AdminErrorCodes,
+  CredentialsMissmatchError,
+  EntityNotFoundError,
+  EntityExistsError,
+  MandatoryFieldsError,
+  handleError,
+  HTTPErrorCodes
 };

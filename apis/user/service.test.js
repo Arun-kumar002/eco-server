@@ -8,7 +8,7 @@ beforeAll(async () => {
   await connectDb();
 });
 
-/******************************************************************/
+/***************************************************************************/
 
 describe("[userService]: createUser", () => {
   test("it should call user createUser controller if the validation success", async () => {
@@ -81,7 +81,7 @@ describe("[userService]: createUser", () => {
   });
 });
 
-/******************************************************************/
+/**************************************************************************/
 
 describe("[userService]: validate", () => {
 

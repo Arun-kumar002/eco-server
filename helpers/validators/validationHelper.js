@@ -1,123 +1,41 @@
-const { checkSchema } = require("express-validator");
 const mongoose = require("mongoose");
-
-const registerSchema = checkSchema({
-  userName: {
-    isLength: {
-      options: { min: 6, max: 30 },
-      errorMessage: "username should be minimum 6 and maximum 30 characters",
-    },
-    exists: {
-      errorMessage: "username is required",
-    },
-    isEmpty: {
-      negated: true,
-      errorMessage: "username cannot be empty",
-    },
-  },
-  password: {
-    isLength: {
-      errorMessage: "password should be greater than 4",
-      options: { min: 5 },
-    },
-    exists: {
-      errorMessage: "password is required",
-    },
-    isEmpty: {
-      negated: true,
-      errorMessage: "password cannot be empty",
-    },
-  },
-  email: {
-    isEmail: {
-      errorMessage: "enter a valid email id",
-    },
-  },
+const joi = require("joi");
+const registerSchema = joi.object({
+  userName: joi.string().required("userName is required"),
+  password: joi.string().min(5).required("password is required"),
+  email: joi.string().email().required("email is required"),
+  mobile: joi.allow(),
+  role: joi.allow(),
+  id:joi.allow()
 });
 
-const loginSchema = checkSchema({
-  email: {
-    isEmail: {
-      errorMessage: "enter a valid email id",
-    },
-  },
-  password: {
-    isLength: {
-      errorMessage: "password should be greater than 4",
-      options: { min: 5 },
-    },
-    exists: {
-      errorMessage: "password is required",
-    },
-    isEmpty: {
-      negated: true,
-      errorMessage: "password cannot be empty",
-    },
-  },
+const loginSchema = joi.object({
+  email: joi.string().email().required("email is required"),
+  password: joi.string().min(5).required("password is required"),
 });
 
-const getAlluserSchema = checkSchema({
-  limit: {
-    exists: {
-      errorMessage: "limit is required",
-    },
-  },
-  skip: {
-    exists: {
-      errorMessage: "pageno is required",
-    },
-  },
-  getCount: {
-    exists: {
-      errorMessage: "getCount is required",
-    },
-  },
+const getAlluserSchema = joi.object({
+  limit: joi.string().required("limit is required"),
+  skip: joi.string().required("skip is required"),
+  getCount: joi.string().required("getCount is required"),
+  name:joi.allow(),
+  email:joi.allow()
 });
 
-const paramsSchema = checkSchema({
-  id: {
-    exists: {
-      errorMessage: "params id  is required",
-    },
-    custom: {
-      options: (value, { req }) => {
-        let isValid = mongoose.Types.ObjectId.isValid(value);
-        if (!isValid) {
-          throw new Error("user id invalid");
-        }
-        return true;
-      },
-    },
-  },
+const paramsSchema =  joi.object({
+  id:  joi.string().required("id is required"),
 });
 
-const addAdminUserSchema = checkSchema({
-  email: {
-    isEmail: {
-      errorMessage: "enter a valid email id",
-    },
-  },
-  password: {
-    isLength: {
-      errorMessage: "password should be greater than 4",
-      options: { min: 5 },
-    },
-    exists: {
-      errorMessage: "password is required",
-    },
-    isEmpty: {
-      negated: true,
-      errorMessage: "password cannot be empty",
-    },
-  },
+const addAdminUserSchema = joi.object({
+  email: joi.string().email().required("email is required"),
+  password: joi.string().min(5).required("password is required"),
 });
 
-const deleteAdminUser = checkSchema({
-  email: {
-    isEmail: {
-      errorMessage: "enter a valid email id",
-    },
-  },
+const deleteAdminUser = joi.object({
+  email: joi.string().email().required("email is required"),
+});
+const fetchUserId= joi.object({
+  email: joi.string().email().required("email is required"),
 });
 //! parse the validation requsets
 const parseError = (error) => {
@@ -136,4 +54,7 @@ module.exports = {
   paramsSchema,
   addAdminUserSchema,
   deleteAdminUser,
+  fetchUserId
 };
+
+

@@ -1,20 +1,29 @@
-const { validationResult } = require("express-validator");
 const authControllers = require("./controller");
 const { hashingPassword } = require("../../helpers/cryptoHelper");
+const ValidationSchema = require("../../helpers/validators/validationHelper");
+const userErrors = require("./error/adminErrors");
+
 const tag = "admin-service";
 
 exports.validateAdmin = async (req, res) => {
-  const errorMessage = await validationService(req);
+  const params={
+    email:req.body.email,
+    password:req.body.password
+  }
+
+  const errorMessage = await validationService(params,ValidationSchema.loginSchema);
+
   if (errorMessage) {
     return res.status(400).json({ status: "error", message: errorMessage });
   }
 
   try {
-    const { email, password } = req.body;
+    const { email, password } = params;
 
     const admin = await authControllers.validate({ email, password });
 
     res.status(200).json({ admin, message: "successfull", status: "success" });
+
   } catch (error) {
     console.log(`[${tag}] validateAdmin:`, error);
 
@@ -26,13 +35,18 @@ exports.validateAdmin = async (req, res) => {
 
 exports.addAdminUser = async (req, res) => {
   try {
-    const errorMessage = await validationService(req);
+    const params={
+      email:req.body.email,
+      password:req.body.password
+    }
+    const errorMessage = await validationService(params,ValidationSchema.addAdminUserSchema);
+
 
     if (errorMessage) {
       return res.status(400).json({ status: "error", message: errorMessage });
     }
 
-    const admin = await authControllers.create(req.body);
+    const admin = await authControllers.create(params);
 
     res
       .status(200)
@@ -48,16 +62,20 @@ exports.addAdminUser = async (req, res) => {
 
 exports.updateAdminUser = async (req, res) => {
   try {
-    const errorMessage = await validationService(req);
+    const params={
+      email:req.body.email,
+      password:req.body.password
+    }
+    const errorMessage = await validationService(params,ValidationSchema.addAdminUserSchema);
 
     if (errorMessage) {
       return res.status(400).json({ status: "error", message: errorMessage });
     }
 
-    let {email,password}=req.body
-    password=hashingPassword(password)
-    
-    const admin = await authControllers.update({email,password});
+    let { email, password } = params;
+    password = hashingPassword(password);
+
+    const admin = await authControllers.update({ email, password });
     res
       .status(200)
       .json({ admin, message: "successfully updated", status: "success" });
@@ -72,13 +90,16 @@ exports.updateAdminUser = async (req, res) => {
 
 exports.deleteAdminUser = async (req, res) => {
   try {
-    const errorMessage = await validationService(req);
+    const params={
+      email:req.query.email
+    }
+    const errorMessage = await validationService(params,ValidationSchema.deleteAdminUser);
 
     if (errorMessage) {
       return res.status(400).json({ status: "error", message: errorMessage });
     }
 
-    const { email } = req.query;
+    const { email } = params;
 
     await authControllers.deleteAdminUserByEmail({ email });
 
@@ -93,15 +114,20 @@ exports.deleteAdminUser = async (req, res) => {
 };
 
 //!service helpers
-const validationService = async (req) => {
-  //server side validation
-  let errors = validationResult(req);
-
-  if (errors.isEmpty()) {
-    return false;
+const validationService = async (params, schema) => {
+  if (
+    !Object.keys(params)[0] === true ||
+    Object.values(params).includes(undefined)
+  ) {
+    throw new userErrors.MandatoryFieldsError();
   }
 
-  const firstError = errors.errors[0];
-
-  return { [firstError.param]: firstError.msg };
+  //server side validation
+  const { error, values } = await schema.validate(params);
+  
+  if (error) {
+    const firstError = error.details[0];
+    return { [firstError.type]: firstError.message };
+  }
+  return false;
 };
