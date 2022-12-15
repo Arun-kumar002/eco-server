@@ -68,7 +68,8 @@ const handleError = (error, tag, req, res) => {
     res.status(HTTPErrorCodes.MANDATORY_FIELDS_ERROR).json({ message: "Fill all mandatatory fields", status: "error" });
     return
   }
-  console.error(`[handlerError] ${req.path}, Errorclass:${error.name}:${error.message}. ${error.stack}. params - ${req.params},body -${req.body}, query -${req.query}`);
+  
+  console.error(`[handlerError]:${tag} path-${req.path}, Errorclass:${error.name}:${error.message}. ${error.stack}. params - ${req.params},body -${req.body}, query -${req.query}`);
   res.status(500).json({message:'internal server error',status:'error'})
   return
   
