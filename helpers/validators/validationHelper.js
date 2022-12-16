@@ -39,10 +39,10 @@ exports.AdminloginSchema = joi.object({
   }),
 });
 exports.getAlluserSchema = joi.object({
-  limit: joi.number().min(1).required().label('Limit').error(()=> {
+  limit: joi.number().required().label('Limit').error(()=> {
     throw new userErrors.ValidationError('limit should be pasitive integer & required')
   }),
-  skip: joi.number().min(1).required().label('Skip').error(()=> {
+  skip: joi.number().required().label('Skip').error(()=> {
     throw new userErrors.ValidationError('skip should be pasitive integer & required')
   }),
   getCount: joi.required().label('getCount').error(()=> {
