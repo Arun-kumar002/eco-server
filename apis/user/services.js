@@ -3,7 +3,6 @@ const { hashingPassword } = require("../../helpers/cryptoHelper");
 const userErrors = require("./error/userErrors");
 const ValidationSchema = require("../../helpers/validators/validationHelper");
 const { default: mongoose } = require("mongoose");
-
 const tag = "user-service";
 
 exports.createUser = async (req, res) => {
