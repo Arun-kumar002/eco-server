@@ -18,7 +18,6 @@ exports.validateAdmin = async (req, res) => {
 
     res.status(200).json({ admin, message: "successfull", status: "success" });
   } catch (error) {
-    console.log(`[${tag}] validateAdmin:`.green, error);
     adminError.handleError(error, tag, req, res);
   }
 };
@@ -37,8 +36,6 @@ exports.addAdminUser = async (req, res) => {
       .status(200)
       .json({ admin, message: "successfully added", status: "success" });
   } catch (error) {
-    console.log(`[${tag}] addAdminUser:`.green, error);
-
     adminError.handleError(error, tag, req, res);
   }
 };
@@ -59,8 +56,6 @@ exports.updateAdminUser = async (req, res) => {
       .status(200)
       .json({ admin, message: "successfully updated", status: "success" });
   } catch (error) {
-    console.log(`[${tag}] updateAdminUser:`.green, error);
-
     adminError.handleError(error, tag, req, res);
   }
 };
@@ -80,8 +75,6 @@ exports.deleteAdminUser = async (req, res) => {
 
     res.status(200).json({ message: "deleted", status: "success" });
   } catch (error) {
-    console.log(`[${tag}] deleteAdminUser:`.green, error);
-
     adminError.handleError(error, tag, req, res);
   }
 };
