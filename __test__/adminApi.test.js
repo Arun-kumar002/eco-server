@@ -178,7 +178,7 @@ describe("/admin update", () => {
       expect(updateAdminresult.modifiedCount==1).toBe(true);
   });
 
-   test.only("test should  return update failed  with wrong email", async () => {
+   test("test should  return update failed  with wrong email", async () => {
     const adminUser = generateRandomAdmin();
     const adminUserResponse = await supertest(app)
       .post(`/api/v1/` + `${adminBaseRoute}`)
@@ -201,8 +201,17 @@ describe("/admin update", () => {
         email: email,
         password: '12344455',
       })
-      expect(updateAdminResponse.statusCode).(HTTPErrorCodes.ENTITY_NOT_FOUND);
+      expect(updateAdminResponse.statusCode).toBe(HTTPErrorCodes.ENTITY_NOT_FOUND);
   });
+
+  test("it should return status-400 for {email:required}", async () => {
+    const response = await supertest(app)
+      .put(`/api/v1/` + `${adminBaseRoute}`)
+      .send({ email: undefined, password: "1234567" });
+    expect(response.statusCode).toBe(HTTPErrorCodes.VALIDATION_ERROR);
+  });
+
+
 });
 
 //http://localhost:5000/api/v1/auth/admin?email=demo@gmail.com
@@ -210,26 +219,53 @@ describe("/admin update", () => {
 describe("/admin delete", () => {
   test("test should deleting a existing admin user", async () => {
     const adminUser = generateRandomAdmin();
-    await supertest(app)
+    const adminUserResponse = await supertest(app)
       .post(`/api/v1/` + `${adminBaseRoute}`)
       .send(adminUser)
       .expect(200);
+    expect(adminUserResponse).toBeDefined();
+    expect(adminUserResponse.statusCode).toBe(200);
+    const result = adminUserResponse._body.admin;
+    expect(result).toBeDefined();
+    expect(result._id).toBeDefined();
+    expect(result.email).toBeDefined();
+    expect(result.password).toBeDefined();
+    expect(result.email).toBe(adminUser.email);
 
-    await supertest(app)
-      .delete(`/api/v1/` + `${adminBaseRoute}` + `?email=` + adminUser.email)
-      .expect(200);
+    let deleteAdminResponse=await supertest(app)
+      .delete(`/api/v1/` + `${adminBaseRoute}` + `?email=` + result.email)
+      expect(deleteAdminResponse.statusCode).toBe(200);
+      expect(JSON.parse(deleteAdminResponse.text)["status"]).toBe('success')
+
   });
 
   test("test should return 400 without query mail id", async () => {
+    const deleteAdminResponse=await supertest(app)
+      .delete(`/api/v1/` + `${adminBaseRoute}` + `?email=`)
+      expect(deleteAdminResponse.statusCode).toBe(HTTPErrorCodes.VALIDATION_ERROR);
+  });
+
+  test("test should return  entity not found for unexisting user", async () => {
     const adminUser = generateRandomAdmin();
-    await supertest(app)
+    const adminUserResponse = await supertest(app)
       .post(`/api/v1/` + `${adminBaseRoute}`)
       .send(adminUser)
       .expect(200);
+    expect(adminUserResponse).toBeDefined();
+    expect(adminUserResponse.statusCode).toBe(200);
+    const result = adminUserResponse._body.admin;
+    expect(result).toBeDefined();
+    expect(result._id).toBeDefined();
+    expect(result.email).toBeDefined();
+    expect(result.password).toBeDefined();
+    expect(result.email).toBe(adminUser.email);
 
-    await supertest(app)
-      .delete(`/api/v1/` + `${adminBaseRoute}` + `?email=`)
-      .expect(HTTPErrorCodes.VALIDATION_ERROR);
+    const email=`${generateRandom.generateRandomString(15)}@gmail.com`
+    expect(email!=result.email).toBe(true)
+
+    const deleteAdminResponse=await supertest(app)
+      .delete(`/api/v1/` + `${adminBaseRoute}` + `?email=` + email)
+      expect(deleteAdminResponse.statusCode).toBe(HTTPErrorCodes.ENTITY_NOT_FOUND);
   });
 });
 

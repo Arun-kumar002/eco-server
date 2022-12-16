@@ -146,3 +146,22 @@
 //   return false;
 // };
 
+//!userService getById we can't test because we need mongoId if we give random id it will rejected by our 
+//!mongo validtor MongoIdIsvalid fun
+// test("it shoul call getUser controller if the validations for params is success", async () => {
+//     let req = mocks.createRequest({
+//       params: {
+//         id: "63986ff87e56130ef94496c6",
+//       },
+//     });
+
+//     let res = mocks.createResponse();
+//     userControllers.getById = jest.fn();
+
+//     await userService.getUser(req, res);
+//     await res.json();
+
+//     expect(res._headers["content-type"]).toBe("application/json");
+//     expect(res.statusCode).toBe(200);
+//     expect(userControllers.getById).toHaveBeenCalledTimes(1);
+//   });

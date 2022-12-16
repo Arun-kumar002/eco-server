@@ -34,7 +34,6 @@ exports.createUser = async (req, res) => {
       .status(200)
       .json({ user: user, message: "successfull", status: "success" });
   } catch (error) {
-    console.error(`[${tag}] createUser:`.blue, error);
     userErrors.handleError(error, tag, req, res);
   }
 };
@@ -52,8 +51,6 @@ exports.validateUser = async (req, res) => {
 
     res.status(200).json({ user, message: "successfull", status: "success" });
   } catch (error) {
-    console.error(`[${tag}] validateUser:`.blue, error);
-
     userErrors.handleError(error, tag, req, res);
   }
 };
@@ -105,7 +102,6 @@ exports.deleteUser = async (req, res) => {
       .status(200)
       .json({ user, message: "successfully deleted", status: "success" });
   } catch (error) {
-    console.error(`[${tag}] deleteUser:`.blue, error);
 
     userErrors.handleError(error, tag, req, res);
   }
@@ -125,7 +121,6 @@ exports.getUser = async (req, res) => {
       .status(200)
       .json({ user, message: "successfully fetched", status: "success" });
   } catch (error) {
-    console.error(`[${tag}] getUser:`.blue, error);
 
     userErrors.handleError(error, tag, req, res);
   }
@@ -141,7 +136,6 @@ exports.userUpdate = async (req, res) => {
       role: req.body.role,
       email: req.body.email,
     };
-    console.log(params);
     await ValidationSchema.updateSchema.validateAsync(params);
     await isMongoIdValid(params.id)
     let { id, userName, email, mobile, password, role } = params;
@@ -160,7 +154,6 @@ exports.userUpdate = async (req, res) => {
       .status(200)
       .json({ message: "updated successfully", user, status: "success" });
   } catch (error) {
-    console.error(`[${tag}] userUpdate:`, error);
     userErrors.handleError(error, tag, req, res);
   }
 };
@@ -186,7 +179,6 @@ exports.fetchUserId = async (req, res) => {
       .status(200)
       .json({ message: "successfull", status: "success", user: user._id });
   } catch (error) {
-    console.error(`[${tag}] fetchUserId:`.blue, error);
 
     userErrors.handleError(error, tag, req, res);
   }

@@ -260,10 +260,9 @@ describe("[userService] : getUser", () => {
     await res.json();
 
     expect(res._headers["content-type"]).toBe("application/json");
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(HTTPErrorCodes.VALIDATION_ERROR);
     expect(userControllers.getById).toHaveBeenCalledTimes(1);
   });
-
   test("it return a error for {id:undefined} the validation fail ", async () => {
     let req = mocks.createRequest({
       params: {

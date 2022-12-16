@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest __test__/adminApi.test.js ",
     "start": "nodemon server.js",
-    "watch": "jest --watchAll",
+    "watch": "jest",
     "utest": "jest apis/user/controller.test.js",
     "stest": "jest apis/user/service.test.js"
   },
