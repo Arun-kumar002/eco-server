@@ -25,16 +25,6 @@ const generateToken = (email) => {
   return token;
 };
 
-// exports. generateRandomUser=()=>{
-//   const inputs = {
-//     userName: "testing-jest",
-//     password: "test123",
-//     mobile: this.generateRandomNumber(55555, 1000000),
-//     role: "user",
-//     email: `${this.generateRandomString(10)}@gmail.com`,
-//   };
-//   return inputs
-// }
 module.exports = {
   generateRandomString,
   generateRandomNumber,

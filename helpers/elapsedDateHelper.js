@@ -1,6 +1,6 @@
 const moment = require("moment");
 const elapsed = (startdate) => {
-  // let time=elapsed("20220910") //!call function like this
+  // let time=elapsed("20220910") 
   const elapesdList = [];
   const duration = moment().diff(moment(startdate)) / 1000;
   const periodInterval = {

@@ -22,11 +22,13 @@ const checkFileCreated = (path, tries, interval) => {
     }, interval);
   });
 };
-console.log(
-  checkFileCreated(
-    "/home/local/BSILIND/arunkumar.s/nodejs/connect/angular7_tutorial.pdf",
-    2,
-    8000
-  )
-);
+
+// console.log(
+//   checkFileCreated(
+//     "/home/local/BSILIND/arunkumar.s/nodejs/connect/angular7_tutorial.pdf",
+//     2,
+//     8000
+//   )
+// );
+
 module.exports = { delay, checkFileCreated };

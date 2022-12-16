@@ -1,6 +1,7 @@
 const fetch = require("node-fetch-commonjs");
-
+//! got error because need new ph no without whatsapp account for register as a meta developer
 const sendMsg = async (phoneNumber) => {
+  //?temporary token
   let token =
     "EAAGwF0uIWzoBACysFwSEPRbDZBM8c76FVft9yxTx7DlKZCkp5ZAPfjmzM5qIZAkgWtD3njH9269WftxKtbXp2kLAn5J3lZAfdrb8cRweRbmMX4Js5m9tejZBEo5ZBfbDHBEx6c1WZCB0J42hDy2DTsACRvVUnPxyZAlR5Du07drabtJZBVcxVYK18YEraHai3iFZCVqSY4ZBfijxfwZDZD";
 let phoneid='100940959539798'
