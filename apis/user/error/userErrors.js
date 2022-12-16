@@ -1,4 +1,5 @@
-const colors = require('colors');
+const logger = require("../../../config/logger");
+
 const UserErrorCode = {
   ENTITY_NOT_FOUND: 101,
   CREDENTIAL_MISSMATCH: 102,
@@ -84,7 +85,7 @@ const handleError = (error, tag, req, res) => {
     res.status(HTTPErrorCodes.VALIDATION_ERROR).json({ message: error.message, status: "error" });
     return
   }
-  console.error(`[handlerError]:${tag} path-${req.path}, Errorclass:${error.name}:${error.message}. ${error.stack}. params - ${req.params},body -${req.body}, query -${req.query}`.green);
+  logger.error(`[handlerError]:${tag} path-${req.path}, Errorclass:${error.name}:${error.message}. ${error.stack}. params - ${req.params},body -${req.body}, query -${req.query}`.green);
   res.status(500).json({message:'internal server error',status:'error'})
   return
   

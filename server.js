@@ -10,8 +10,19 @@ const { PORT } = require("./config/index");
 const adminRoutes = require("./apis/admin/route");
 const userRoutes = require("./apis/user/route");
 const notFoundRoutes = require("./routes/notfoundroute");
+const logger = require("./config/logger");
 
 //!middleware section
+app.use((req,res,next)=>{
+  logger.info(`path-${req.path}, method:${req.method}`)
+  let oldsend=res.send
+  res.send=function(data){
+    logger.info(req.body)
+    logger.info(data)
+    oldsend.apply(res,arguments)
+  }
+  next()
+})
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(
@@ -31,7 +42,11 @@ app.use("/", notFoundRoutes);
 connectDb();
 
 app.listen(PORT, (_) => {
-  console.log(`server is listen port no ${PORT}`);
+  try {
+    console.log(`server is listen port no ${PORT}`);
+  } catch (error) {
+    logger.error('server-error',error)
+  }
 });
 
 module.exports = app;
