@@ -1,11 +1,13 @@
 const joi = require("joi");
 const userErrors=require('../../apis/user/error/userErrors')
+const AdminErrors=require('../../apis/admin/error/adminErrors')
+
 
 exports.registerSchema = joi.object({
   userName: joi.string().required().label('userName').error((error)=> {
     throw new userErrors.ValidationError('userName is Required')
   }),
-  password: joi.string().min(5).max(15).required().label('Password').error(()=> {
+  password: joi.string().min(5).max(15).optional().label('Password').error(()=> {
     throw new userErrors.ValidationError('Password is Required 5 to 15 chr')
   }),
   email: joi.string().email({tlds: { allow: ['com', 'net'] } }).required().label('Email').error(()=> {
@@ -28,12 +30,19 @@ exports.loginSchema = joi.object({
     throw new userErrors.ValidationError('Password is Required 5 to 15 chr')
   }),
 });
-
+exports.AdminloginSchema = joi.object({
+  email: joi.string().email({tlds: { allow: ['com', 'net'] } }).required().label('Email').error(()=> {
+    throw new AdminErrors.ValidationError('please Enter valid email')
+  }),
+  password: joi.string().min(5).max(15).required().label('Password').error(()=> {
+    throw new AdminErrors.ValidationError('Password is Required')
+  }),
+});
 exports.getAlluserSchema = joi.object({
-  limit: joi.number().integer().required().label('Limit').error(()=> {
+  limit: joi.number().integer().positive().min(1).required().label('Limit').error(()=> {
     throw new userErrors.ValidationError('limit should be pasitive integer & required')
   }),
-  skip: joi.number().integer().required().label('Skip').error(()=> {
+  skip: joi.number().integer().positive().min(1).required().label('Skip').error(()=> {
     throw new userErrors.ValidationError('skip should be pasitive integer & required')
   }),
   getCount: joi.required().label('getCount').error(()=> {
@@ -55,16 +64,16 @@ exports.paramsSchema = joi.object({
 
 exports.addAdminUserSchema = joi.object({
   email: joi.string().email({tlds: { allow: ['com', 'net'] } }).required().label('Email').error(()=> {
-    throw new userErrors.ValidationError('please Enter valid email')
+    throw new AdminErrors.ValidationError('please Enter valid email')
   }),
   password: joi.string().min(5).max(15).required().label('Password').error(()=> {
-    throw new userErrors.ValidationError('Password is Required 5 to 15 chr')
+    throw new AdminErrors.ValidationError('Password is Required 5 to 15 chr')
   }),
 });
 
 exports.deleteAdminUser = joi.object({
   email: joi.string().email({tlds: { allow: ['com', 'net'] } }).required().label('Email').error(()=> {
-    throw new userErrors.ValidationError('please Enter valid email')
+    throw new AdminErrors.ValidationError('please Enter valid email')
   }),
 });
 
@@ -84,7 +93,7 @@ exports.updateSchema=joi.object({
   email: joi.string().email({tlds: { allow: ['com', 'net'] } }).required().label('Email').error(()=> {
     throw new userErrors.ValidationError('please Enter valid email')
   }),
-  mobile: joi.number().required().label('Mobile').error(()=> {
+  mobile: joi.number().optional().label('Mobile').error(()=> {
     throw new userErrors.ValidationError('mobile no is required')
   }),
   role: joi.string().optional().label('Role').error(()=> {

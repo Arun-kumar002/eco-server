@@ -1,12 +1,11 @@
 let supertest = require("supertest");
-const { AdminErrorCodes } = require("../apis/admin/error/adminErrors");
 const app = require("../server");
 const { HTTPErrorCodes } = require("../apis/user/error/userErrors");
 const generateRandom = require(".././helpers/generaterandonHelpers");
 const crypto = require("../helpers/cryptoHelper");
 // //!admin
 let adminBaseRoute = "admin";
-//http://localhost:5000/auth/admin
+//http://localhost:5000/api/v1/api/v1/auth/admin
 describe("/admin register", () => {
   test("test should create new admin user", async () => {
     let adminUser = generateRandomAdmin();
@@ -27,11 +26,11 @@ describe("/admin register", () => {
     await supertest(app)
       .post(`/api/v1/` + `${adminBaseRoute}`)
       .send(adminUser)
-      .expect(AdminErrorCodes.ENTITY_ALREADY_EXISTS);
+      .expect(HTTPErrorCodes.ENTITY_ALREADY_EXISTS);
   });
 });
 
-//http://localhost:5000/auth/admin/login
+//http://localhost:5000/api/v1/auth/admin/login
 describe("/admin login", () => {
   test("test should check a admin is existing", async () => {
     let adminUser = generateRandomAdmin();
@@ -60,11 +59,11 @@ describe("/admin login", () => {
         password: "admin13",
         role: adminUser.role,
       })
-      .expect(AdminErrorCodes.CREDENTIALS_MISSMATCH);
+      .expect(HTTPErrorCodes.CREDENTIAL_MISSMATCH);
   });
 });
 
-//http://localhost:5000/auth/admin
+//http://localhost:5000/api/v1/auth/admin
 describe("/admin update", () => {
   test("test should update the existing admin user with the email", async () => {
     let adminUser = generateRandomAdmin();
@@ -97,11 +96,11 @@ describe("/admin update", () => {
         password: "admin154",
         role: adminUser.role,
       })
-      .expect(AdminErrorCodes.ENTITY_UPDATE_FAILED);
+      .expect(HTTPErrorCodes.ENTITY_NOT_FOUND);
   });
 });
 
-//http://localhost:5000/auth/admin?email=demo@gmail.com
+//http://localhost:5000/api/v1/auth/admin?email=demo@gmail.com
 
 describe("/admin delete", () => {
   test("test should deleting a existing admin user", async () => {
@@ -125,14 +124,14 @@ describe("/admin delete", () => {
 
     await supertest(app)
       .delete(`/api/v1/` + `${adminBaseRoute}` + `?email=`)
-      .expect(AdminErrorCodes.VALIDATION_ERROR);
+      .expect(HTTPErrorCodes.VALIDATION_ERROR);
   });
 });
 
-//http:localhost:5000/*
+//http:localhost:5000/api/v1/*
 describe("/not found routes", () => {
   test("test should return not found 404", async () => {
-    await supertest(app).get(`/admin/`).expect(AdminErrorCodes.NOT_FOUND);
+    await supertest(app).get(`/admin/`).expect(404);
   });
 });
 

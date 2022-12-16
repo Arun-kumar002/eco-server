@@ -34,6 +34,11 @@ class EntityExistsError extends BaseError {
     super(UserErrorCode.ENTITY_ALREADY_EXISTS, "user email id already exist");
   }
 }
+class ValidationError extends BaseError{
+  constructor(errorMessage) {
+    super(UserErrorCode.VALIDATION_ERROR,errorMessage);
+  }
+}
 
 const HTTPErrorCodes = {
   ENTITY_NOT_FOUND: 401,
@@ -64,14 +69,14 @@ const handleError = (error, tag, req, res) => {
     res.status(HTTPErrorCodes.MANDATORY_FIELDS_ERROR).json({ message: "Fill all mandatatory fields", status: "error" });
     return
   }
-  if (error instanceof BaseError && error.errorCode === 108) {
-    res.status(HTTPErrorCodes.MANDATORY_FIELDS_ERROR).json({ message: "Fill all mandatatory fields", status: "error" });
+  if(error instanceof BaseError && error.errorCode == 108){
+    res.status(HTTPErrorCodes.VALIDATION_ERROR).json({ message: error.message, status: "error" });
     return
   }
-  
-  console.error(`[handlerError]:${tag} path-${req.path}, Errorclass:${error.name}:${error.message}. ${error.stack}. params - ${req.params},body -${req.body}, query -${req.query}`);
+  console.error(`[handlerError]:${tag} path-${req.path}, Errorclass:${error.name}:${error.message}. ${error.stack}. params - ${req.params},body -${req.body}, query -${req.query}`.red);
   res.status(500).json({message:'internal server error',status:'error'})
   return
+
   
 };
 
@@ -81,5 +86,6 @@ module.exports = {
   EntityExistsError,
   MandatoryFieldsError,
   handleError,
-  HTTPErrorCodes
+  HTTPErrorCodes,
+  ValidationError
 };

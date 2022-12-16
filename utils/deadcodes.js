@@ -115,11 +115,9 @@
 //   return enteredPassword==password
 // };
 
-
-
-//!convert custom fun to error instance now its controllable 
+//!convert custom fun to error instance now its controllable
 //const validationService = async (params, schema) => {
-  //server side validation
+//server side validation
 //   const { error } = await schema.validate(params);
 //   if (error) {
 //     const firstError = error.details[0];
@@ -127,3 +125,24 @@
 //   }
 //   return false;
 // };
+
+//!express validator is not good for our application because it takes request for validation and if any
+//!any field is not satisfied also it process whole request
+// const validationService = async (params, schema) => {
+//   if (
+// /    !Object.keys(params)[0] === true ||
+//     Object.values(params).includes(undefined)
+//   ) {
+//     throw new userErrors.MandatoryFieldsError();
+//   }
+
+//   //server side validation
+//   const { error, values } = await schema.validate(params);
+
+//   if (error) {
+//     const firstError = error.details[0];
+//     return { [firstError.type]: firstError.message };
+//   }
+//   return false;
+// };
+

@@ -1,7 +1,9 @@
+const queryString = require("node:querystring");
 const userControllers = require("./controller");
 const { hashingPassword } = require("../../helpers/cryptoHelper");
 const userErrors = require("./error/userErrors");
 const ValidationSchema = require("../../helpers/validators/validationHelper");
+const { default: mongoose } = require("mongoose");
 
 const tag = "user-service";
 
@@ -32,7 +34,7 @@ exports.createUser = async (req, res) => {
       .status(200)
       .json({ user: user, message: "successfull", status: "success" });
   } catch (error) {
-    console.error(`[${tag}] createUser:`, error);
+    console.error(`[${tag}] createUser:`.blue, error);
     userErrors.handleError(error, tag, req, res);
   }
 };
@@ -50,7 +52,7 @@ exports.validateUser = async (req, res) => {
 
     res.status(200).json({ user, message: "successfull", status: "success" });
   } catch (error) {
-    console.error(`[${tag}] validateUser:`, error);
+    console.error(`[${tag}] validateUser:`.blue, error);
 
     userErrors.handleError(error, tag, req, res);
   }
@@ -61,7 +63,10 @@ exports.getAllUsers = async (req, res) => {
     const params = {
       skip: parseInt(req.query.skip),
       limit: parseInt(req.query.limit),
-      getCount: req.query.getCount ===undefined? undefined: !parseInt(req.query.getCount),
+      getCount:
+        req.query.getCount === undefined
+          ? undefined
+          : !parseInt(req.query.getCount),
       name: req.query.name,
       email: req.query.email,
     };
@@ -89,18 +94,18 @@ exports.getAllUsers = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const params = {
-      id: req.params.id,
+      id: req.params.id == "undefined" ? undefined : req.params.id,
     };
-
+    
     await ValidationSchema.paramsSchema.validateAsync(params);
-
+    await isMongoIdValid(params.id)
     let user = await userControllers.deleteById(params.id);
 
     res
       .status(200)
       .json({ user, message: "successfully deleted", status: "success" });
   } catch (error) {
-    console.error(`[${tag}] deleteUser:`, error);
+    console.error(`[${tag}] deleteUser:`.blue, error);
 
     userErrors.handleError(error, tag, req, res);
   }
@@ -109,19 +114,18 @@ exports.deleteUser = async (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const params = {
-      id: req.params.id,
+      id: req.params.id == "undefined" ? undefined : req.params.id,
     };
 
     await ValidationSchema.paramsSchema.validateAsync(params);
-
-
+    await isMongoIdValid(params.id)
     const user = await userControllers.getById(params.id);
 
     res
       .status(200)
       .json({ user, message: "successfully fetched", status: "success" });
   } catch (error) {
-    console.error(`[${tag}] getUser:`, error);
+    console.error(`[${tag}] getUser:`.blue, error);
 
     userErrors.handleError(error, tag, req, res);
   }
@@ -130,16 +134,16 @@ exports.getUser = async (req, res) => {
 exports.userUpdate = async (req, res) => {
   try {
     const params = {
-      id: req.params.id,
+      id: req.params.id == "undefined" ? undefined : req.params.id,
       userName: req.body.userName,
       password: req.body.password,
       mobile: req.body.mobile,
       role: req.body.role,
       email: req.body.email,
     };
-
+    console.log(params);
     await ValidationSchema.updateSchema.validateAsync(params);
-
+    await isMongoIdValid(params.id)
     let { id, userName, email, mobile, password, role } = params;
     password = hashingPassword(password);
 
@@ -157,7 +161,6 @@ exports.userUpdate = async (req, res) => {
       .json({ message: "updated successfully", user, status: "success" });
   } catch (error) {
     console.error(`[${tag}] userUpdate:`, error);
-
     userErrors.handleError(error, tag, req, res);
   }
 };
@@ -183,10 +186,18 @@ exports.fetchUserId = async (req, res) => {
       .status(200)
       .json({ message: "successfull", status: "success", user: user._id });
   } catch (error) {
-    console.error(`[${tag}] fetchUserId:`, error);
+    console.error(`[${tag}] fetchUserId:`.blue, error);
 
     userErrors.handleError(error, tag, req, res);
   }
 };
 
 //!service helpers
+
+const isMongoIdValid = (id) => {
+  let isValid = mongoose.Types.ObjectId.isValid(id);
+  if (!isValid) {
+    throw new userErrors.MongoIdInvalidError();
+  }
+  return;
+};
