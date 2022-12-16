@@ -39,7 +39,6 @@
     "nodemailer": "^6.8.0",
     "pdf-to-png": "^1.0.3",
     "python": "0.0.4",
-    "query-string": "^8.0.3",
     "sinon": "^15.0.0",
     "supertest": "^6.3.1",
     "ts-jest": "^29.0.3",

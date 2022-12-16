@@ -1,4 +1,3 @@
-const queryString = require("node:querystring");
 const userControllers = require("./controller");
 const { hashingPassword } = require("../../helpers/cryptoHelper");
 const userErrors = require("./error/userErrors");
