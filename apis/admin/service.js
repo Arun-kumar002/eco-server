@@ -11,6 +11,7 @@ exports.validateAdmin = async (req, res) => {
     password: req.body.password,
   };
   try {
+    
     await ValidationSchema.AdminloginSchema.validateAsync(params);
     const { email, password } = params;
 
