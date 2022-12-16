@@ -40,7 +40,8 @@ exports.update = async ({ email, password }) => {
   }
   password=hashingPassword(password)
   
-  let updated = adminUser.updateOne({ password:password }, { new: true });
+  let updated = await adminUser.updateOne({ password:password }, { new: true });
+
   return updated;
 };
 

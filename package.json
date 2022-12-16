@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest __test__/userApi.test.js ",
+    "test": "jest __test__/adminApi.test.js ",
     "start": "nodemon server.js",
     "watch": "jest --watchAll",
     "utest": "jest apis/user/controller.test.js",
