@@ -1,10 +1,7 @@
-const logger = require("../../../config/logger");
-
 const UserErrorCode = {
   ENTITY_NOT_FOUND: 101,
   CREDENTIAL_MISSMATCH: 102,
   ENTITY_ALREADY_EXISTS: 103,
-  MONGO_ID_INVALID:104,
   ENTITY_ID_INVALID: 106,
   MANDATORY_FIELDS_ERROR: 107,
   VALIDATION_ERROR: 108,
@@ -42,11 +39,6 @@ class ValidationError extends BaseError{
     super(UserErrorCode.VALIDATION_ERROR,errorMessage);
   }
 }
-class MongoIdInvalidError extends BaseError {
-  constructor() {
-    super(UserErrorCode.MONGO_ID_INVALID, "MongoId invalid..");
-  }
-}
 
 const HTTPErrorCodes = {
   ENTITY_NOT_FOUND: 401,
@@ -68,27 +60,23 @@ const handleError = (error, tag, req, res) => {
     return
   }
 
-  
   if (error instanceof BaseError && error.errorCode === 103) {
     res.status(HTTPErrorCodes.ENTITY_ALREADY_EXISTS).json({ message: "Entity already exist", status: "error" });
     return
   }
-  if(error instanceof BaseError && error.errorCode == 104){
-    res.status(HTTPErrorCodes.VALIDATION_ERROR).json({ message: 'user id invalid....', status: "error" });
-    return
-  }
+
   if (error instanceof BaseError && error.errorCode === 107) {
     res.status(HTTPErrorCodes.MANDATORY_FIELDS_ERROR).json({ message: "Fill all mandatatory fields", status: "error" });
     return
   }
-
   if(error instanceof BaseError && error.errorCode == 108){
-    res.status(HTTPErrorCodes.VALIDATION_ERROR).json({ message: error.message ? error.message:'validation failed', status: "error" });
+    res.status(HTTPErrorCodes.VALIDATION_ERROR).json({ message: error.message, status: "error" });
     return
   }
-  logger.error(`[handlerError]:${tag} path-${req.path}, Errorclass:${error.name}:${error.message}. ${error.stack}. params - ${req.params},body -${req.body}, query -${req.query}`.green);
+  console.error(`[handlerError]:${tag} path-${req.path}, Errorclass:${error.name}:${error.message}. ${error.stack}. params - ${req.params},body -${req.body}, query -${req.query}`.red);
   res.status(500).json({message:'internal server error',status:'error'})
   return
+
   
 };
 
@@ -97,8 +85,7 @@ module.exports = {
   EntityNotFoundError,
   EntityExistsError,
   MandatoryFieldsError,
-  ValidationError,
   handleError,
   HTTPErrorCodes,
-  MongoIdInvalidError
+  ValidationError
 };

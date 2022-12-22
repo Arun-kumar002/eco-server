@@ -26,6 +26,7 @@ exports.createUser = async (req, res) => {
       mobile,
       role,
       email,
+      profile:"https://avatars.dicebear.com/v2/avataaars/" + userName +".svg?options[mood][]=happy"
     });
 
     res
@@ -65,11 +66,11 @@ exports.getAllUsers = async (req, res) => {
       name: req.query.name,
       email: req.query.email,
     };
-
     await ValidationSchema.getAlluserSchema.validateAsync(params);
 
     let { skip, limit, getCount, name, email } = params;
 
+  
     const users = await userControllers.getAll({
       skip,
       limit,
@@ -91,16 +92,15 @@ exports.deleteUser = async (req, res) => {
     const params = {
       id: req.params.id == "undefined" ? undefined : req.params.id,
     };
-    
+
     await ValidationSchema.paramsSchema.validateAsync(params);
-    await isMongoIdValid(params.id)
+    await isMongoIdValid(params.id);
     let user = await userControllers.deleteById(params.id);
 
     res
       .status(200)
       .json({ user, message: "successfully deleted", status: "success" });
   } catch (error) {
-
     userErrors.handleError(error, tag, req, res);
   }
 };
@@ -112,14 +112,13 @@ exports.getUser = async (req, res) => {
     };
 
     await ValidationSchema.paramsSchema.validateAsync(params);
-    await isMongoIdValid(params.id)
+    await isMongoIdValid(params.id);
     const user = await userControllers.getById(params.id);
 
     res
       .status(200)
       .json({ user, message: "successfully fetched", status: "success" });
   } catch (error) {
-
     userErrors.handleError(error, tag, req, res);
   }
 };
@@ -135,7 +134,7 @@ exports.userUpdate = async (req, res) => {
       email: req.body.email,
     };
     await ValidationSchema.updateSchema.validateAsync(params);
-    await isMongoIdValid(params.id)
+    await isMongoIdValid(params.id);
     let { id, userName, email, mobile, password, role } = params;
     password = hashingPassword(password);
 
@@ -146,6 +145,7 @@ exports.userUpdate = async (req, res) => {
       mobile,
       password,
       role,
+      profile:"https://avatars.dicebear.com/v2/avataaars/" + userName +".svg?options[mood][]=happy"
     });
 
     res
@@ -177,7 +177,6 @@ exports.fetchUserId = async (req, res) => {
       .status(200)
       .json({ message: "successfull", status: "success", user: user._id });
   } catch (error) {
-
     userErrors.handleError(error, tag, req, res);
   }
 };

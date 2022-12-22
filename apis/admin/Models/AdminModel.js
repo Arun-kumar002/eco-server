@@ -4,6 +4,10 @@ const { PASSWORD_SECRET } = require("../../../config");
 
 const AdminSchmema = new Schema(
   {
+    userName:{
+      type: String,
+      default:'admin'
+    },
     email: {
       type: String,
       require: true,
@@ -17,9 +21,25 @@ const AdminSchmema = new Schema(
       require: true,
       enum: ["admin"],
     },
+    socketId: {
+      type: Array,
+      required: false,
+    },
+    isonline: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
+    chatwith: {
+      type: String,
+      required: false,
+    },
+    profile:{
+      type:String,
+      default:"https://avatars.dicebear.com/v2/avataaars/admin.svg?options[mood][]=happy"
+    }
   },
-  { timestamps: true,collection:'adminusers' }   //collections
+  { timestamps: true, collection: "adminusers" } //collections
 );
-
 
 module.exports = model("AdminUser", AdminSchmema);

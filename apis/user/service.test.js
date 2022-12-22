@@ -260,7 +260,7 @@ describe("[userService] : getUser", () => {
     await res.json();
 
     expect(res._headers["content-type"]).toBe("application/json");
-    expect(res.statusCode).toBe(HTTPErrorCodes.VALIDATION_ERROR);
+    expect(res.statusCode).toBe(200);
     expect(userControllers.getById).toHaveBeenCalledTimes(1);
   });
   test("it return a error for {id:undefined} the validation fail ", async () => {
@@ -318,4 +318,7 @@ describe("[userService]: deleteUser", () => {
     expect(res.statusCode).toBe(HTTPErrorCodes.MANDATORY_FIELDS_ERROR);
     expect(userControllers.deleteById).toHaveBeenCalledTimes(0);
   });
+});
+afterAll(async () => {
+  mongoose.connection.close()
 });

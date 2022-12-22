@@ -13,7 +13,8 @@ describe("/user post", () => {
     const createUser = generateRandomUser();
     const response = await supertest(app)
       .post(`/${baseRoute}/`)
-      .send(createUser);
+      .send(createUser)
+      
     expect(response).toBeDefined();
     expect(response.headers["content-type"]).toBe(
       "application/json; charset=utf-8"
@@ -503,3 +504,6 @@ const generateRandomUser = (i) => {
   };
   return inputs;
 };
+afterAll(async () => {
+  
+});

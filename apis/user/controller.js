@@ -3,7 +3,7 @@ const UserModel = require("./Models/UserModel");
 const UserErrors = require("./error/userErrors");
 const { unHashingPassword } = require("../../helpers/cryptoHelper");
 
-exports.create = async ({ userName, password, mobile, role, email }) => {
+exports.create = async ({ userName, password, mobile, role, email,profile }) => {
 
   if (userName === null || email === null) {
     throw new UserErrors.MandatoryFieldsError();
@@ -20,6 +20,7 @@ exports.create = async ({ userName, password, mobile, role, email }) => {
     mobile,
     role,
     email,
+    profile
   });
 
   return user;
@@ -32,7 +33,7 @@ exports.validate = async ({ email, password }) => {
   const user = await UserModel.findOne({ email }).select("+password");
 
   if (user === null) {
-    throw new UserErrors.UserNotFoundError();
+    throw new UserErrors.EntityNotFoundError();
   }
   user.password = unHashingPassword(user.password);
 
@@ -55,7 +56,10 @@ exports.getAll = async ({ skip, limit, getCount, name, email }) => {
   if (email && email != "") {
     query.email = email;
   }
-
+  if (skip < 0 || limit < 0) {
+    throw new UserErrors.ValidationError();
+  }
+  
   let count = undefined;
 
   if (getCount == true) {
@@ -86,12 +90,13 @@ exports.updateById = async ({
   mobile,
   password,
   role,
+  profile
 }) => {
   const user = await await this.getById(id);
 
   const updated = await UserModel.findOneAndUpdate(
     { email: user.email },
-    { userName, email, mobile, password, role },
+    { userName, email, mobile, password, role ,profile},
     { new: true }
   ).select("+password");
 
@@ -130,4 +135,5 @@ exports.getById = async (id) => {
   return user;
 
 };
+
 

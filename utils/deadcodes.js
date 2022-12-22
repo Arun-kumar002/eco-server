@@ -165,3 +165,53 @@
 //     expect(res.statusCode).toBe(200);
 //     expect(userControllers.getById).toHaveBeenCalledTimes(1);
 //   });
+
+
+//!for react charts
+// routes.get(`/${baseRoute}/chart/user`, async (req, res) => {
+//     console.log('im here');
+//   let chart = await UserModel.find({
+//     created_at: {
+//       $gte: ("2022-11-15T00:00:00.000Z"),
+//     },
+//   });
+//   res.status(200).json({ chart, status: "sucess" });
+// });
+//!socket
+
+// let users = [];
+// const addUser = (userId, socketId) => {
+//   !users.some((user) => user.userId === userId) &&
+//     users.push({ userId, socketId });
+// };
+// const removeUser = (socketId) => {
+//   users = users.filter((user) => user.socketId != socketId);
+// };
+
+// const getUser = (userId) => {
+//   return users.find((user) => user.userId == userId);
+// };
+
+// io.on("connect", (socket) => {
+//   console.log("a user connected");
+//   //!connect
+//   socket.on("addUser", (user) => {
+//     addUser(user, socket.id);
+//     io.emit("getUsers", users);
+//   });
+//   //!send & get
+//   socket.on("sendMessage", ({ senderId, receiverId, messages }) => {
+//     const user = getUser(receiverId);
+//     io.to(user?.socketId).emit("getMessage", {
+//       senderId,
+//       messages,
+//     });
+//   });
+//   //!disconnect
+//   socket.on("disconnected", () => {
+//     console.log("a user is disconnected");
+//     removeUser(socket.id);
+//     io.emit("getUsers", users);
+//   });
+// });
+

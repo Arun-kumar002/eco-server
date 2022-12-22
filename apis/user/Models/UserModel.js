@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-const {}=require('validator')
+const {} = require("validator");
 const UserSchema = new Schema(
   {
     userName: {
@@ -27,6 +27,22 @@ const UserSchema = new Schema(
       type: String,
       default: "user",
     },
+    socketId: {
+      type: Array,
+      required: false,
+    },
+    isonline: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
+    chatwith: {
+      type: String,
+      required: false,
+    },
+    profile:{
+      type:String
+    }
   },
   { timestamps: true, collection: "users" } // collation: "User"
 );

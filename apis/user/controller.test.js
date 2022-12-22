@@ -3,7 +3,7 @@ const { connectDb } = require("../../config/db");
 const generateRandom = require("../../helpers/generaterandonHelpers");
 const userErrors = require("./error/userErrors");
 const { hashingPassword, unHashingPassword} = require("../../helpers/cryptoHelper");
-
+const { default: mongoose } = require("mongoose");
 beforeAll(() => {
   connectDb();
 });
@@ -658,3 +658,6 @@ const UserNameCountValidation = (i) => {
     role: "user",
   };
 };
+afterAll(async () => {
+  mongoose.connection.close()
+});

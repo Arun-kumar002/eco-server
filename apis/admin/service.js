@@ -80,3 +80,12 @@ exports.deleteAdminUser = async (req, res) => {
   }
 };
 
+//!private
+exports.getAdmin=async(req,res)=>{
+  try {
+   let users=await authControllers.getAdmin();
+    res.status(200).json({users,message: "successfull", status: "success" });
+  } catch (error) {
+    adminError.handleError(error, tag, req, res);
+  }
+}

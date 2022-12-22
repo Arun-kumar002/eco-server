@@ -242,7 +242,9 @@ describe("/admin delete", () => {
   test("test should return 400 without query mail id", async () => {
     const deleteAdminResponse=await supertest(app)
       .delete(`/api/v1/` + `${adminBaseRoute}` + `?email=`)
-      expect(deleteAdminResponse.statusCode).toBe(HTTPErrorCodes.VALIDATION_ERROR);
+      expect(deleteAdminResponse.statusCode).toBe(HTTPErrorCodes.VALIDATION_ERROR)
+      
+      
   });
 
   test("test should return  entity not found for unexisting user", async () => {
@@ -285,3 +287,6 @@ const generateRandomAdmin = (i) => {
   };
   return admin;
 };
+afterAll(async () => {
+  
+});

@@ -5,10 +5,11 @@
   "main": "server.js",
   "scripts": {
     "test": "jest __test__/adminApi.test.js ",
-    "start": "nodemon server.js",
+    "start": "node server.js",
     "watch": "jest",
     "utest": "jest apis/user/controller.test.js",
-    "stest": "jest apis/user/service.test.js"
+    "stest": "jest apis/user/service.test.js",
+    "ltest": "jest __test__/logger.test.js"
   },
   "keywords": [],
   "author": "",
@@ -40,6 +41,7 @@
     "pdf-to-png": "^1.0.3",
     "python": "0.0.4",
     "sinon": "^15.0.0",
+    "socket.io": "^4.5.4",
     "supertest": "^6.3.1",
     "ts-jest": "^29.0.3",
     "validator": "^13.7.0",
