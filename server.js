@@ -4,10 +4,11 @@ const cors = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
 const app = express();
+
 const http = require("http").Server(app);
 var io = require("socket.io")(http, {
   cors: {
-    origin: "http://localhost:3001",
+    origin: "http://localhost:3000",
   },
 });
 //!local modules
@@ -18,7 +19,7 @@ const userRoutes = require("./apis/user/route");
 const notFoundRoutes = require("./routes/notfoundroute");
 const MessengerRoute = require("./apis/messenger/route");
 const logger = require("./config/logger");
-const MessageModel = require("./apis/messenger/Models/Messages");
+const MessageModel = require("./apis/messenger/models/Messages");
 
 //!middleware section
 
@@ -90,14 +91,7 @@ const connectSocket = () => {
 
     socket.on(
       "sendMessage",
-      async ({ senderId, receiverId, messages, conversationId }) => {
-        console.log(
-          "sendMessage",
-          senderId,
-          receiverId,
-          messages,
-          conversationId
-        );
+      async ({ senderId, receiverId, messages, conversationId ,senderName}) => {
         const newMessage = new MessageModel({
           conversationId: conversationId,
           sender: senderId,
@@ -110,7 +104,8 @@ const connectSocket = () => {
         let data = {
           senderId,
           messages,
-          receiverId
+          receiverId,
+          senderName
       }
         io.emit("getMessage", data);
       }

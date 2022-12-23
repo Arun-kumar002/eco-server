@@ -1,5 +1,5 @@
-const ConversationModel = require("./Models/Conversations");
-const MessageModel = require("./Models/Messages");
+const ConversationModel = require("./models/Conversations");
+const MessageModel = require("./models/Messages");
 
 exports.newConverstion = async ({ senderId, receiverId }) => {
   let data = await ConversationModel.findOne({

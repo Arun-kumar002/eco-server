@@ -1,5 +1,5 @@
 const { generateToken } = require("../../helpers/generaterandonHelpers");
-const UserModel = require("./Models/UserModel");
+const UserModel = require("./models/UserModel");
 const UserErrors = require("./error/userErrors");
 const { unHashingPassword } = require("../../helpers/cryptoHelper");
 

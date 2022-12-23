@@ -1,5 +1,5 @@
 //!local module
-const AdminModel = require("./Models/AdminModel");
+const AdminModel = require("./models/AdminModel");
 const { generateToken } = require("../../helpers/generaterandonHelpers");
 const AdminErrors = require("./error/adminErrors");
 const crypto = require("../../helpers/cryptoHelper");
