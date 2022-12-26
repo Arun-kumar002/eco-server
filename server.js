@@ -20,6 +20,8 @@ const notFoundRoutes = require("./routes/notfoundroute");
 const MessengerRoute = require("./apis/messenger/route");
 const logger = require("./config/logger");
 const MessageModel = require("./apis/messenger/models/Messages");
+const UserModel=require('./apis/user/models/UserModel')
+const AdminModel=require('./apis/admin/models/AdminModel')
 
 //!middleware section
 
@@ -98,7 +100,10 @@ const connectSocket = () => {
           messages: messages,
         });
         await newMessage.save();
-
+        let userNotify=await UserModel.updateOne({_id:receiverId},{$push:{socketId:senderName}})
+        if(userNotify.matchedCount==0){
+          await AdminModel.updateOne({_id:receiverId},{$push:{socketId:senderName}})
+        }
         const user =  getUser(receiverId);
         const toid= user.socketId
         let data = {

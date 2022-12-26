@@ -30,10 +30,6 @@ const AdminSchmema = new Schema(
       default: false,
       required: false,
     },
-    chatwith: {
-      type: String,
-      required: false,
-    },
     profile:{
       type:String,
       default:"https://avatars.dicebear.com/v2/avataaars/admin.svg?options[mood][]=happy"

@@ -67,8 +67,6 @@ const handleError = (error, tag, req, res) => {
     res.status(HTTPErrorCodes.CREDENTIAL_MISSMATCH).json({ message: "invalid email & password", status: "error" });
     return
   }
-
-  
   if (error instanceof BaseError && error.errorCode === 103) {
     res.status(HTTPErrorCodes.ENTITY_ALREADY_EXISTS).json({ message: "Entity already exist", status: "error" });
     return
@@ -89,7 +87,7 @@ const handleError = (error, tag, req, res) => {
   logger.error(`[handlerError]:${tag} path-${req.path}, Errorclass:${error.name}:${error.message}. ${error.stack}. params - ${req.params},body -${req.body}, query -${req.query}`.green);
   res.status(500).json({message:'internal server error',status:'error'})
   return
-  
+
 };
 
 module.exports = {

@@ -89,3 +89,4 @@ exports.getAdmin=async(req,res)=>{
     adminError.handleError(error, tag, req, res);
   }
 }
+
