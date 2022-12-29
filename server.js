@@ -3,6 +3,12 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
+const Keycloak = require("keycloak-connect");
+const session = require("express-session");
+
+const memoryStore = new session.MemoryStore();
+const keycloak = new Keycloak({ store: memoryStore });
+
 const app = express();
 
 const http = require("http").Server(app);
@@ -20,11 +26,22 @@ const notFoundRoutes = require("./routes/notfoundroute");
 const MessengerRoute = require("./apis/messenger/route");
 const logger = require("./config/logger");
 const MessageModel = require("./apis/messenger/models/Messages");
-const UserModel=require('./apis/user/models/UserModel')
-const AdminModel=require('./apis/admin/models/AdminModel')
+const UserModel = require("./apis/user/models/UserModel");
+const AdminModel = require("./apis/admin/models/AdminModel");
 
 //!middleware section
-
+//?session
+app.use(
+  session({
+    secret: "ecobillz",
+    resave: false,
+    saveUninitialized: true,
+    store: memoryStore,
+  })
+);
+app.set( 'trust proxy', true );
+app.use( keycloak.middleware() );
+//?logger
 app.use((req, res, next) => {
   logger.info(`path-${req.path}, method:${req.method}`);
   let oldsend = res.send;
@@ -53,8 +70,8 @@ app.use(morgan("dev"));
 app.use(helmet());
 
 //!mount here
-app.use("/api/v1", userRoutes);
-app.use("/api/v1", adminRoutes);
+app.use("/api/v1",keycloak.protect(), userRoutes);
+app.use("/api/v1",keycloak.protect(), adminRoutes);
 app.use("/api/v1", MessengerRoute);
 app.use("/", notFoundRoutes);
 
@@ -93,28 +110,55 @@ const connectSocket = () => {
 
     socket.on(
       "sendMessage",
-      async ({ senderId, receiverId, messages, conversationId ,senderName}) => {
+      async ({
+        senderId,
+        receiverId,
+        messages,
+        conversationId,
+        senderName,
+      }) => {
         const newMessage = new MessageModel({
           conversationId: conversationId,
           sender: senderId,
           messages: messages,
         });
         await newMessage.save();
-        let userNotify=await UserModel.updateOne({_id:receiverId},{$push:{socketId:senderName}})
-        if(userNotify.matchedCount==0){
-          await AdminModel.updateOne({_id:receiverId},{$push:{socketId:senderName}})
+        let userNotify = await UserModel.updateOne(
+          { _id: receiverId },
+          { $push: { socketId: senderName } }
+        );
+        if (userNotify.matchedCount == 0) {
+          await AdminModel.updateOne(
+            { _id: receiverId },
+            { $push: { socketId: senderName } }
+          );
         }
-        const user =  getUser(receiverId);
-        const toid= user.socketId
+        const user = getUser(receiverId);
+        const toid = user.socketId;
         let data = {
           senderId,
           messages,
           receiverId,
-          senderName
-      }
+          senderName,
+        };
         io.emit("getMessage", data);
       }
     );
+    //!web
+    socket.on("addCall", ({ receiverId, senderId, offer }) => {
+      let datas = {
+        receiverId,
+        senderId,
+        offer: offer,
+      };
+
+      io.emit("getCall", datas);
+    });
+
+    socket.on("callAccepted", ({ receiverId, senderId, answer }) => {
+      let getdatas = { receiverId, senderId, answer };
+      io.emit("getAccepted", getdatas);
+    });
 
     socket.on("disconnected", () => {
       console.log("a user is disconnected");

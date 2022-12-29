@@ -14,3 +14,5 @@
 {"cause":{"address":"13.127.244.254","code":"EHOSTUNREACH","errno":-113,"port":27017,"syscall":"connect"},"connectionGeneration":1,"level":"error","service":"[user-service]:","timestamp":"2022-12-26T08:25:39.083Z"}
 {"cause":{"address":"13.127.244.254","code":"EHOSTUNREACH","errno":-113,"port":27017,"syscall":"connect"},"connectionGeneration":0,"level":"error","service":"[user-service]:","timestamp":"2022-12-26T08:25:51.419Z"}
 {"cause":{"address":"13.127.244.254","code":"EHOSTUNREACH","errno":-113,"port":27017,"syscall":"connect"},"connectionGeneration":0,"level":"error","service":"[user-service]:","timestamp":"2022-12-26T10:22:34.768Z"}
+{"code":"ESERVFAIL","hostname":"_mongodb._tcp.cluster0.qmxmkpj.mongodb.net","level":"error","service":"[user-service]:","syscall":"querySrv","timestamp":"2022-12-27T11:10:23.488Z"}
+{"code":"ESERVFAIL","hostname":"_mongodb._tcp.cluster0.qmxmkpj.mongodb.net","level":"error","service":"[user-service]:","syscall":"querySrv","timestamp":"2022-12-29T04:35:50.123Z"}

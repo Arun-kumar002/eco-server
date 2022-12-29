@@ -82,7 +82,6 @@
 //       }
 //     }
 //!validator using request its so costlier
-//  ///ids
 // custom: {
 //     options: (value, { req }) => {
 //       let isValid = mongoose.Types.ObjectId.isValid(value);
@@ -93,9 +92,7 @@
 //     },
 //   },
 // },
-
 //!accidental complixity
-
 // if (
 // /**/  !Object.keys(params)[0] === true ||
 //   Object.values(params).includes(undefined)
@@ -177,11 +174,10 @@
 //   });
 //   res.status(200).json({ chart, status: "sucess" });
 // });
-//!socket
-
+//!sockets
 // let users = [];
 // const addUser = (userId, socketId) => {
-//   !users.some((user) => user.userId === userId) &&
+// !users.some((user) => user.userId === userId) &&
 //     users.push({ userId, socketId });
 // };
 // const removeUser = (socketId) => {
